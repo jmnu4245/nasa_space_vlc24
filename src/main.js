@@ -4,17 +4,18 @@ import Planeta from './Planeta.js';
 
 const scene = new THREE.Scene();
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+// Camera
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 100;
 
-    //Fondo
-    const loader = new THREE.TextureLoader();
-    loader.load('./../entorno/fondo.jpg', function(texture) {
+// Fondo
+const loader = new THREE.TextureLoader();
+loader.load('./../entorno/fondo.jpg', function(texture) {
     const geometry = new THREE.SphereGeometry(500, 60, 40); // Tamaño grande
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
-    scene.add(skybox);});
- 
+    scene.add(skybox);
+});
 
 // Renderer
 const renderer = new THREE.WebGLRenderer();
@@ -61,34 +62,51 @@ const size = [
     24622 * SCALE_SIZE    // Neptuno
 ];
 
-const velocidadRotacion = [0.0394, 0.0171, -0.0041, 1.0, 0.9756, 2.4242, 2.2429, -1.3953, 1.4907];
+const VEL_SCALE = 0.000184; // Factor de escala para las velocidades,0.000184 1 vuelta por minuto
+const velocidadRotacion = [
+    0.0394 * VEL_SCALE, 
+    0.0171 * VEL_SCALE, 
+    -0.0041 * VEL_SCALE, 
+    1.0 * VEL_SCALE, 
+    0.9756 * VEL_SCALE, 
+    2.4242 * VEL_SCALE, 
+    2.2429 * VEL_SCALE, 
+    -1.3953 * VEL_SCALE, 
+    1.4907 * VEL_SCALE
+];
 let planetas = Array(9).fill(0);
+let sphere = Array(9).fill(0);
 
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
     planetas[i] = planeta;
-    scene.add(planetas[i].setPlaneta());
+    sphere[i] = planetas[i].setPlaneta();
+    scene.add(sphere[i]);
 }
 
-// Create light
+// Crear los anillos de Saturno y añadirlos como hijos de Saturno
+
+// Crear luz
 const ambientLight = new THREE.AmbientLight(0x404040); // Luz ambiental suave
 scene.add(ambientLight);
 const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
-   setupCameraControls(camera,renderer)
-    // Evento de clic
+// Movimiento Camara
+setupCameraControls(camera, renderer, scene);
 
+// Evento de clic
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-
-    // Animation loop
-    function animate() {
+// Animation loop
+function animate() {
     requestAnimationFrame(animate);
-    
+    for (let i = 0; i < planetas.length; i++) {
+        sphere[i].rotation.y += planetas[i].velocidadRotacion;
+    }
     // Renderizar la escena
     renderer.render(scene, camera);
-    }
-    animate();
+}
+animate();
