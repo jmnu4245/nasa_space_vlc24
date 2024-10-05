@@ -14,8 +14,9 @@ window.addEventListener('click', (event) => {
     // Si hay intersecciones
     if (intersects.length > 0) {
         // Cambiar el color del primer objeto intersectado (en este caso, el planeta)
-
-
+        if(intersects[0].object instanceof Planeta){
+            sidebar.classList.add('open');
+        }
         intersects[0].object.material.color.set(Math.random() * 0xffffff);
     }
 });
