@@ -10,9 +10,6 @@ export class CelestialBody {
     M: number;
     t0: number;
     n: number;
-    n_degPerDay: number;
-    e_deg: number;
-    isPotentiallyHazardous: boolean;
 
     constructor(
         id: string,
@@ -26,9 +23,6 @@ export class CelestialBody {
         M: number,
         t0: number,
         n: number,
-        n_degPerDay: number,
-        e_deg: number,
-        isPotentiallyHazardous: boolean
     ) {
         this.id = id;
         this.name = name;
@@ -41,21 +35,21 @@ export class CelestialBody {
         this.M = M;
         this.t0 = t0;
         this.n = n;
-        this.n_degPerDay = n_degPerDay;
-        this.e_deg = e_deg;
-        this.isPotentiallyHazardous = isPotentiallyHazardous;
+    
     }
 
     calcular_E(t: number): number {
+       const n_degPerDay: number = this.n / 365.6;
+    const e_deg: number = this.e * 180 / Math.PI;
         console.log('  -ejecutando calcular_E');
         const tol: number = 1e-6;
         const max_iterations: number = 500;
-        let E0: number = this.n * (t - this.t0) + this.e_deg * Math.sin(this.n * (t - this.t0));
+        let E0: number = this.n * (t - this.t0) + e_deg * Math.sin(this.n * (t - this.t0));
         let E: number = 0;
         let iterations = 0;
 
         while (iterations < max_iterations) {
-            E = E0 - (E0 - this.e_deg * Math.sin(E0) - this.n * (t - this.t0)) / (1 - this.e_deg * Math.cos(E0));
+            E = E0 - (E0 - e_deg * Math.sin(E0) - this.n * (t - this.t0)) / (1 - e_deg * Math.cos(E0));
             iterations++;
 
             if (Math.abs(E - E0) <= tol) {
