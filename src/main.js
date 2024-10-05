@@ -77,10 +77,7 @@ const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
-    //Movimiento Camara
-    setupCameraControls(camera, renderer);
-
-
+   setupCameraControls(camera,renderer)
     // Evento de clic
 
 const raycaster = new THREE.Raycaster();
@@ -90,7 +87,7 @@ const mouse = new THREE.Vector2();
     // Animation loop
     function animate() {
     requestAnimationFrame(animate);
-
+    
     // Renderizar la escena
     renderer.render(scene, camera);
     }
