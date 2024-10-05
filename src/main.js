@@ -23,7 +23,10 @@ const scene = new THREE.Scene();
 
     //Create light
     const ambientLight = new THREE.AmbientLight(0x404040); // Luz ambiental suave
-scene.add(ambientLight);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
+        pointLight.position.set(5, 5, 5);
+        scene.add(pointLight);
 
 //Camara
 setupCameraControls(camera, renderer);
@@ -34,28 +37,13 @@ setupCameraControls(camera, renderer);
 //const gridHelper = new THREE.GridHelper(gridSize, gridDivisions);
 //scene.add(gridHelper);
 
-
-
-
-    const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
-    
-    //const controls = new OrbitControls(camera,renderer.domElement);
-    //controls.target.set(0, 0, 0);
-   
-
-
-//
     // Animation loop
     function animate() {
-        requestAnimationFrame(animate);
-        //pointLight.rotation.y +=0.01;
+    requestAnimationFrame(animate);
 
-        sphere.rotation.x += 0.01;
-        sphere.position.x+=0.01;
-        sphere.rotation.y += 0.01;
-        //controls.update(); // Importante para el damping
+    sphere.rotation.x += 0.01;
+    sphere.position.x+=0.01;
+    sphere.rotation.y += 0.01;
 
     // Renderizar la escena
     renderer.render(scene, camera);
