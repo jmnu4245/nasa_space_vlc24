@@ -1,23 +1,27 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
 // cameraControls.js
-export function setupCameraControls(camera, renderer,scene) {
+export function setupCameraControls(camera, renderer, scene,rselPlanet,posSelPlanet) {
+    console.log(rselPlanet);
+    console.log(posSelPlanet);
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
-    const zoomSpeed = 0.5; // Velocidad de zoom
-    const minZoom = 10; // Distancia mínima de zoom
-    const maxZoom = 100; // Distancia máxima de zoom
-    const movementScale = 0.005; // Controla la velocidad de rotación
-    let radius = 60; // Radio inicial de la esfera
+    let minZoom = 4*rselPlanet;let maxZoom = rselPlanet*100; //Máx y min de zoom
+     //velocidad de rotación
+    let radius = rselPlanet*2*5; // Radio inicial de la esfera
     let theta = 0; // Ángulo inicial en el plano XY
     let phi = 0; // Ángulo inicial en el plano Z
+    let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]);
+    
+    let zoomSpeed = 0.005*radius; // Velocidad de zoom
+    let movementScale = 0.015*radius ;
 
     // Función para actualizar la posición de la cámara
     function updateCameraPosition() {
-        camera.position.x = radius * Math.sin(phi) * Math.cos(theta);
-        camera.position.y = radius * Math.cos(phi);
-        camera.position.z = radius * Math.sin(phi) * Math.sin(theta);
-        camera.lookAt(new THREE.Vector3(0, 0, 0)); // Siempre mirar al centro
+        camera.position.x = center.x+radius * Math.sin(phi) * Math.cos(theta);
+        camera.position.y = center.y+radius * Math.cos(phi);
+        camera.position.z = center.z+radius * Math.sin(phi) * Math.sin(theta);
+        camera.lookAt(center); // Siempre mirar al centro
     }
 
     // Manejar eventos del mouse para la rotación
@@ -40,8 +44,8 @@ export function setupCameraControls(camera, renderer,scene) {
             phi -= deltaMove.y * movementScale; // Rotación en X
 
             // Limitar el ángulo phi para evitar voltear la cámara
-            const maxPhi = Math.PI / 2 - 0.1; // Máximo 90 grados
-            const minPhi = -Math.PI / 2 + 0.1; // Mínimo -90 grados
+            const maxPhi = Math.PI -0.1; // Máximo 180 grados
+            const minPhi =  0.1; // Mínimo 0 grados
             phi = Math.max(minPhi, Math.min(maxPhi, phi));
 
             // Actualizar la posición de la cámara

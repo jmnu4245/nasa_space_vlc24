@@ -99,8 +99,12 @@ const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
+let selectedplanet=planetas[7];
+let rSelPlanet=selectedplanet.tamaño;
+let posSelPlanet=selectedplanet.posicion;
+
 // Movimiento Camara
-setupCameraControls(camera, renderer, scene);
+setupCameraControls(camera, renderer, scene, rSelPlanet,posSelPlanet);
 
 // Evento de clic
 const raycaster = new THREE.Raycaster();
@@ -114,6 +118,7 @@ function animate() {
     }    for (let i = 0; i < planetas.length; i++) {
         sphere[i].rotation.y += planetas[i].velocidadRotacion;
     }
+
     // Renderizar la escena
     renderer.render(scene, camera);
 }
