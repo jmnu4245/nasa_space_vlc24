@@ -63,18 +63,7 @@ const size = [
     24622 * SCALE_SIZE    // Neptuno
 ];
 
-const VEL_SCALE = 0.000184; // Factor de escala para las velocidades,0.000184 1 vuelta por minuto
-const velocidadRotacion = [
-    0.0394 * VEL_SCALE, 
-    0.0171 * VEL_SCALE, 
-    -0.0041 * VEL_SCALE, 
-    1.0 * VEL_SCALE, 
-    0.9756 * VEL_SCALE, 
-    2.4242 * VEL_SCALE, 
-    2.2429 * VEL_SCALE, 
-    -1.3953 * VEL_SCALE, 
-    1.4907 * VEL_SCALE
-];
+
 const VEL_SCALE = 0.000184; // Factor de escala para las velocidades,0.000184 1 vuelta por minuto
 const velocidadRotacion = [
     0.0394 * VEL_SCALE, 
@@ -89,7 +78,7 @@ const velocidadRotacion = [
 ];
 let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
-let sphere = Array(9).fill(0);
+
 
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
