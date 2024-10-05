@@ -18,3 +18,4 @@ class Planeta {
     }
         
 }
+export default Planeta;
