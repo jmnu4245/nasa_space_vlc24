@@ -41,9 +41,9 @@ export class CelestialBody {
     calcular_E(t: number): number {
        const n_degPerDay: number = this.n / 365.6;
     const e_deg: number = this.e * 180 / Math.PI;
-        console.log('  -ejecutando calcular_E');
+        //console.log('  -ejecutando calcular_E');
         const tol: number = 1e-6;
-        const max_iterations: number = 500;
+        const max_iterations: number = 1000;
         let E0: number = this.n * (t - this.t0) + e_deg * Math.sin(this.n * (t - this.t0));
         let E: number = 0;
         let iterations = 0;
@@ -63,7 +63,7 @@ export class CelestialBody {
     }
 
     xy_orbita_plano_orbital(E: number): [number, number] {
-        console.log('  -ejecutando la funcion xy_orbita_plano_orbital');
+        //console.log('  -ejecutando la funcion xy_orbita_plano_orbital');
         const x = this.a * (Math.cos(E) - this.e);
         const y = this.a * Math.sqrt(1 - this.e ** 2) * Math.sin(E);
         return [x, y];

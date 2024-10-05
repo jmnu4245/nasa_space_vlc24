@@ -5,8 +5,8 @@ import { fetchData } from './apiHandler';
 import { CelestialBody} from './operations';
 
 const apiUrl = "https://ssd-api.jpl.nasa.gov/sbdb.api";
-const numero_asteroides = 10;
-const numero_cometas = 10;
+const numero_asteroides = 4;
+const numero_cometas = 0;
 const spkids_asteroides = apiHandler.obtenerPrimerosAsteroides(numero_asteroides)
 const spkids_cometas = apiHandler.obtenerPrimerosCometas(numero_cometas)
 const nombres_asteroides = apiHandler.obtenerNombresAsteroides(numero_asteroides)
@@ -48,7 +48,7 @@ for (let i = 0; i < numero_asteroides; i++) {
         });
     }
     console.log(celestialBodyAsteroidPairs);
-    console.log(celestialBodyCometPairs);
+    //console.log(celestialBodyCometPairs);
 }
 
 
