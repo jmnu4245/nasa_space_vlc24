@@ -25,6 +25,6 @@ class Planeta {
         sphere.position.set(...this.posicion);
         return sphere;
     }
-        
 }
+        
 export default Planeta; // Exportar la clase Planeta

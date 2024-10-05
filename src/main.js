@@ -61,13 +61,26 @@ const size = [
     24622 * SCALE_SIZE    // Neptuno
 ];
 
-const velocidadRotacion = [0.0394, 0.0171, -0.0041, 1.0, 0.9756, 2.4242, 2.2429, -1.3953, 1.4907];
+const VEL_SCALE = 0.000184; // Factor de escala para las velocidades,0.000184 1 vuelta por minuto
+const velocidadRotacion = [
+    0.0394 * VEL_SCALE, 
+    0.0171 * VEL_SCALE, 
+    -0.0041 * VEL_SCALE, 
+    1.0 * VEL_SCALE, 
+    0.9756 * VEL_SCALE, 
+    2.4242 * VEL_SCALE, 
+    2.2429 * VEL_SCALE, 
+    -1.3953 * VEL_SCALE, 
+    1.4907 * VEL_SCALE
+];
 let planetas = Array(9).fill(0);
+let sphere = Array(9).fill(0);
 
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
     planetas[i] = planeta;
-    scene.add(planetas[i].setPlaneta());
+    sphere[i] = planetas[i].setPlaneta()
+    scene.add(sphere[i]);
 }
 
 // Create light
@@ -89,7 +102,11 @@ const mouse = new THREE.Vector2();
 
     // Animation loop
     function animate() {
+
     requestAnimationFrame(animate);
+    for (let i = 0; i < planetas.length; i++) {
+        sphere[i].rotation.y += planetas[i].velocidadRotacion;
+    }
 
     // Renderizar la escena
     renderer.render(scene, camera);
