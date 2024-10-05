@@ -1,20 +1,21 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 import { setupCameraControls } from './cameracontrol.js';
 import Planeta from './Planeta.js';
+import Anillos from './Anillos.js';
 
 const scene = new THREE.Scene();
 
-    // Camera
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+// Camera
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-    //Fondo
-    const loader = new THREE.TextureLoader();
-    loader.load('./../entorno/fondo.jpg', function(texture) {
+// Fondo
+const loader = new THREE.TextureLoader();
+loader.load('./../entorno/fondo.jpg', function(texture) {
     const geometry = new THREE.SphereGeometry(500, 60, 40); // Tamaño grande
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
-    scene.add(skybox);});
- 
+    scene.add(skybox);
+});
 
 // Renderer
 const renderer = new THREE.WebGLRenderer();
@@ -44,7 +45,7 @@ const posIni = [
     [1.00 * SCALE_DISTANCE, 0, 0],         // Tierra
     [1.52 * SCALE_DISTANCE, 0, 0],         // Marte
     [5.20 * SCALE_DISTANCE, 0, 0],         // Júpiter
-    [9.58 * SCALE_DISTANCE, 0, 0],         // Saturno
+    [9.58 * SCALE_DISTANCE, 0, 0],         // Saturno 9.58
     [19.22 * SCALE_DISTANCE, 0, 0],        // Urano
     [30.05 * SCALE_DISTANCE, 0, 0]         // Neptuno
 ];
@@ -79,36 +80,34 @@ let sphere = Array(9).fill(0);
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
     planetas[i] = planeta;
-    sphere[i] = planetas[i].setPlaneta()
+    sphere[i] = planetas[i].setPlaneta();
     scene.add(sphere[i]);
 }
 
-// Create light
+// Crear los anillos de Saturno y añadirlos como hijos de Saturno
+let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', size[6]);
+
+// Crear luz
 const ambientLight = new THREE.AmbientLight(0x404040); // Luz ambiental suave
 scene.add(ambientLight);
 const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
-    //Movimiento Camara
-    setupCameraControls(camera, renderer);
+// Movimiento Camara
+setupCameraControls(camera, renderer);
 
-
-    // Evento de clic
-
+// Evento de clic
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
-
-    // Animation loop
-    function animate() {
-
+// Animation loop
+function animate() {
     requestAnimationFrame(animate);
     for (let i = 0; i < planetas.length; i++) {
         sphere[i].rotation.y += planetas[i].velocidadRotacion;
     }
-
     // Renderizar la escena
     renderer.render(scene, camera);
-    }
-    animate();
+}
+animate();
