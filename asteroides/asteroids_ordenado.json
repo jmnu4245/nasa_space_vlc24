@@ -1,0 +1,583 @@
+[
+    {
+      "spkid": 20000001,
+      "full_name": "1 Ceres (A801 AA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 939.4
+    },
+    {
+      "spkid": 20020000,
+      "full_name": "20000 Varuna (2000 WR106)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 900
+    },
+    {
+      "spkid": 20000004,
+      "full_name": "4 Vesta (A807 FA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 525.4
+    },
+    {
+      "spkid": 20000002,
+      "full_name": "2 Pallas (A802 FA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 513
+    },
+    {
+      "spkid": 20000010,
+      "full_name": "10 Hygiea (A849 GA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 407.12
+    },
+    {
+      "spkid": 20015789,
+      "full_name": "15789 (1993 SC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 328
+    },
+    {
+      "spkid": 20000704,
+      "full_name": "704 Interamnia (A910 TC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 306.313
+    },
+    {
+      "spkid": 20000052,
+      "full_name": "52 Europa (A858 CA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 303.918
+    },
+    {
+      "spkid": 20010199,
+      "full_name": "10199 Chariklo (1997 CU26)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 302
+    },
+    {
+      "spkid": 20000511,
+      "full_name": "511 Davida (A903 KB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 270.327
+    },
+    {
+      "spkid": 20000031,
+      "full_name": "31 Euphrosyne (A854 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 267.08
+    },
+    {
+      "spkid": 20000451,
+      "full_name": "451 Patientia (A899 XA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 253.9
+    },
+    {
+      "spkid": 20000087,
+      "full_name": "87 Sylvia (A866 KA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 253.051
+    },
+    {
+      "spkid": 20000003,
+      "full_name": "3 Juno (A804 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 246.596
+    },
+    {
+      "spkid": 20000065,
+      "full_name": "65 Cybele (A861 EB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 237.26
+    },
+    {
+      "spkid": 20000088,
+      "full_name": "88 Thisbe (A866 LA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 232
+    },
+    {
+      "spkid": 20000015,
+      "full_name": "15 Eunomia (A851 OA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 231.689
+    },
+    {
+      "spkid": 20095626,
+      "full_name": "95626 (2002 GZ32)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 230.5
+    },
+    {
+      "spkid": 20000624,
+      "full_name": "624 Hektor (A907 CF)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 225
+    },
+    {
+      "spkid": 20000016,
+      "full_name": "16 Psyche (A852 FA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 222
+    },
+    {
+      "spkid": 20000324,
+      "full_name": "324 Bamberga (A892 DA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 220.691
+    },
+    {
+      "spkid": 20000048,
+      "full_name": "48 Doris (A857 SA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 216.473
+    },
+    {
+      "spkid": 20000375,
+      "full_name": "375 Ursula (A893 SB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 216
+    },
+    {
+      "spkid": 20000107,
+      "full_name": "107 Camilla (A868 WA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 210.37
+    },
+    {
+      "spkid": 20000121,
+      "full_name": "121 Hermione (A872 JA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 209
+    },
+    {
+      "spkid": 20000117,
+      "full_name": "117 Lomia (A871 RB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 208.974
+    },
+    {
+      "spkid": 20000106,
+      "full_name": "106 Dione (A868 TA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 207.869
+    },
+    {
+      "spkid": 20000041,
+      "full_name": "41 Daphne (A856 KA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 205.495
+    },
+    {
+      "spkid": 20000094,
+      "full_name": "94 Aurora (A867 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 204.89
+    },
+    {
+      "spkid": 20000013,
+      "full_name": "13 Egeria (A850 VA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 202.636
+    },
+    {
+      "spkid": 20000045,
+      "full_name": "45 Eugenia (A857 MA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 202.327
+    },
+    {
+      "spkid": 20000019,
+      "full_name": "19 Fortuna (A852 QA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 200
+    },
+    {
+      "spkid": 20000007,
+      "full_name": "7 Iris (A847 PA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 199.83
+    },
+    {
+      "spkid": 20000334,
+      "full_name": "334 Chicago (A892 QB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 198.77
+    },
+    {
+      "spkid": 20000024,
+      "full_name": "24 Themis (A853 GA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 198
+    },
+    {
+      "spkid": 20000154,
+      "full_name": "154 Bertha (A875 VD)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 192.611
+    },
+    {
+      "spkid": 20042355,
+      "full_name": "42355 Typhon (2002 CR46)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 192
+    },
+    {
+      "spkid": 20000702,
+      "full_name": "702 Alauda (A910 OA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 190.98
+    },
+    {
+      "spkid": 20005145,
+      "full_name": "5145 Pholus (1992 AD)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 190
+    },
+    {
+      "spkid": 20000009,
+      "full_name": "9 Metis (A848 HA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 190
+    },
+    {
+      "spkid": 20000029,
+      "full_name": "29 Amphitrite (A854 EB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 189.559
+    },
+    {
+      "spkid": 20054598,
+      "full_name": "54598 Bienor (2000 QC243)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 187.5
+    },
+    {
+      "spkid": 20000006,
+      "full_name": "6 Hebe (A847 NA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 185.18
+    },
+    {
+      "spkid": 20000130,
+      "full_name": "130 Elektra (A873 DA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 180.652
+    },
+    {
+      "spkid": 20000165,
+      "full_name": "165 Loreley (A876 PA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 180.083
+    },
+    {
+      "spkid": 20000039,
+      "full_name": "39 Laetitia (A856 CA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 179.484
+    },
+    {
+      "spkid": 20000209,
+      "full_name": "209 Dido (A879 UC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 179.008
+    },
+    {
+      "spkid": 20000096,
+      "full_name": "96 Aegle (A868 DA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 177.774
+    },
+    {
+      "spkid": 20000423,
+      "full_name": "423 Diotima (A896 XA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 175.859
+    },
+    {
+      "spkid": 20000259,
+      "full_name": "259 Aletheia (A886 MA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 174.318
+    },
+    {
+      "spkid": 20000372,
+      "full_name": "372 Palma (A893 QB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 173.642
+    },
+    {
+      "spkid": 20000747,
+      "full_name": "747 Winchester (A913 EK)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 171.71
+    },
+    {
+      "spkid": 20000409,
+      "full_name": "409 Aspasia (A895 XC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 171.012
+    },
+    {
+      "spkid": 20000153,
+      "full_name": "153 Hilda (A875 VC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 170.63
+    },
+    {
+      "spkid": 20000790,
+      "full_name": "790 Pretoria (A912 BE)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 170.37
+    },
+    {
+      "spkid": 20127546,
+      "full_name": "127546 (2002 XU93)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 170
+    },
+    {
+      "spkid": 20000241,
+      "full_name": "241 Germania (A884 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 168.9
+    },
+    {
+      "spkid": 20000047,
+      "full_name": "47 Aglaja (A857 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 168.174
+    },
+    {
+      "spkid": 20000488,
+      "full_name": "488 Kreusa (A902 MC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 168.117
+    },
+    {
+      "spkid": 20000532,
+      "full_name": "532 Herculina (A904 HE)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 167.791
+    },
+    {
+      "spkid": 20000022,
+      "full_name": "22 Kalliope (A852 WA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 167.536
+    },
+    {
+      "spkid": 20000566,
+      "full_name": "566 Stereoskopia (A905 KA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 167.381
+    },
+    {
+      "spkid": 20000049,
+      "full_name": "49 Pales (A857 SB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 166.252
+    },
+    {
+      "spkid": 20002060,
+      "full_name": "2060 Chiron (1977 UB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 166
+    },
+    {
+      "spkid": 20000059,
+      "full_name": "59 Elpis (A860 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 165.119
+    },
+    {
+      "spkid": 20000386,
+      "full_name": "386 Siegena (A894 EB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 165.01
+    },
+    {
+      "spkid": 20000128,
+      "full_name": "128 Nemesis (A872 WA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 162.515
+    },
+    {
+      "spkid": 20000194,
+      "full_name": "194 Prokne (A879 FA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 161.667
+    },
+    {
+      "spkid": 20000654,
+      "full_name": "654 Zelinda (A908 AM)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 160.736
+    },
+    {
+      "spkid": 20000185,
+      "full_name": "185 Eunike (A878 EA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 160.464
+    },
+    {
+      "spkid": 20000146,
+      "full_name": "146 Lucina (A875 LC)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 160.31
+    },
+    {
+      "spkid": 20000054,
+      "full_name": "54 Alexandra (A858 RA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 160.12
+    },
+    {
+      "spkid": 20000596,
+      "full_name": "596 Scheila (A906 DL)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 159.726
+    },
+    {
+      "spkid": 20000444,
+      "full_name": "444 Gyptis (A899 FA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 159.331
+    },
+    {
+      "spkid": 20000190,
+      "full_name": "190 Ismene (A878 SA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 159
+    },
+    {
+      "spkid": 20000238,
+      "full_name": "238 Hypatia (A884 NA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 155.659
+    },
+    {
+      "spkid": 20000120,
+      "full_name": "120 Lachesis (A872 GB)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 155.132
+    },
+    {
+      "spkid": 20000085,
+      "full_name": "85 Io (A865 SA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 154.79
+    },
+    {
+      "spkid": 20000361,
+      "full_name": "361 Bononia (A893 EF)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 154.334
+    },
+    {
+      "spkid": 20000093,
+      "full_name": "93 Minerva (A867 QA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 154.155
+    },
+    {
+      "spkid": 20000014,
+      "full_name": "14 Irene (A851 KA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 152
+    },
+    {
+      "spkid": 20000776,
+      "full_name": "776 Berbericia (A914 BE)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 151.711
+    },
+    {
+      "spkid": 20000139,
+      "full_name": "139 Juewa (A874 TA)",
+      "neo": "N",
+      "pha": "N",
+      "diameter": 151.116
+    }
+  ]

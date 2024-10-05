@@ -1,0 +1,219 @@
+[
+    {
+      "spkid": 1001647,
+      "full_name": "167P/CINEOS",
+      "neo": "",
+      "pha": "",
+      "diameter": 66.17
+    },
+    {
+      "spkid": 1000079,
+      "full_name": "29P/Schwassmann-Wachmann 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 60.4
+    },
+    {
+      "spkid": 1000132,
+      "full_name": "C/1995 O1 (Hale-Bopp)",
+      "neo": "",
+      "pha": "",
+      "diameter": 60
+    },
+    {
+      "spkid": 1003189,
+      "full_name": "C/2011 KP36 (Spacewatch)",
+      "neo": "",
+      "pha": "",
+      "diameter": 55.1
+    },
+    {
+      "spkid": 1000140,
+      "full_name": "109P/Swift-Tuttle",
+      "neo": "Y",
+      "pha": "",
+      "diameter": 26
+    },
+    {
+      "spkid": 1000063,
+      "full_name": "28P/Neujmin 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 21.4
+    },
+    {
+      "spkid": 1000373,
+      "full_name": "C/2001 OG108 (LONEOS)",
+      "neo": "Y",
+      "pha": "",
+      "diameter": 13.6
+    },
+    {
+      "spkid": 1000129,
+      "full_name": "C/1991 L3 (Levy)",
+      "neo": "Y",
+      "pha": "",
+      "diameter": 11.6
+    },
+    {
+      "spkid": 1000036,
+      "full_name": "1P/Halley",
+      "neo": "Y",
+      "pha": "",
+      "diameter": 11
+    },
+    {
+      "spkid": 1000035,
+      "full_name": "65P/Gunn",
+      "neo": "",
+      "pha": "",
+      "diameter": 10.8
+    },
+    {
+      "spkid": 1000094,
+      "full_name": "10P/Tempel 2",
+      "neo": "",
+      "pha": "",
+      "diameter": 10.6
+    },
+    {
+      "spkid": 1000055,
+      "full_name": "99P/Kowal 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 10.2
+    },
+    {
+      "spkid": 1000304,
+      "full_name": "C/1983 H1 (IRAS-Araki-Alcock)",
+      "neo": "",
+      "pha": "",
+      "diameter": 9.2
+    },
+    {
+      "spkid": 1000121,
+      "full_name": "117P/Helin-Roman-Alu 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 9
+    },
+    {
+      "spkid": 1000002,
+      "full_name": "49P/Arend-Rigaux",
+      "neo": "",
+      "pha": "",
+      "diameter": 8.48
+    },
+    {
+      "spkid": 1000015,
+      "full_name": "32P/Comas Sola",
+      "neo": "",
+      "pha": "",
+      "diameter": 8.4
+    },
+    {
+      "spkid": 1000115,
+      "full_name": "151P/Helin",
+      "neo": "",
+      "pha": "",
+      "diameter": 8.4
+    },
+    {
+      "spkid": 1000059,
+      "full_name": "77P/Longmore",
+      "neo": "",
+      "pha": "",
+      "diameter": 8.2
+    },
+    {
+      "spkid": 1000029,
+      "full_name": "90P/Gehrels 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 7.8
+    },
+    {
+      "spkid": 1000070,
+      "full_name": "30P/Reinmuth 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 7.8
+    },
+    {
+      "spkid": 1000102,
+      "full_name": "53P/Van Biesbroeck",
+      "neo": "",
+      "pha": "",
+      "diameter": 6.66
+    },
+    {
+      "spkid": 1000061,
+      "full_name": "96P/Machholz 1",
+      "neo": "Y",
+      "pha": "",
+      "diameter": 6.4
+    },
+    {
+      "spkid": 1000080,
+      "full_name": "31P/Schwassmann-Wachmann 2",
+      "neo": "",
+      "pha": "",
+      "diameter": 6.2
+    },
+    {
+      "spkid": 1000112,
+      "full_name": "184P/Lovas 2",
+      "neo": "",
+      "pha": "",
+      "diameter": 6.2
+    },
+    {
+      "spkid": 1000093,
+      "full_name": "9P/Tempel 1",
+      "neo": "",
+      "pha": "",
+      "diameter": 6
+    },
+    {
+      "spkid": 1000126,
+      "full_name": "137P/Shoemaker-Levy 2",
+      "neo": "",
+      "pha": "",
+      "diameter": 5.8
+    },
+    {
+      "spkid": 1000049,
+      "full_name": "48P/Johnson",
+      "neo": "",
+      "pha": "",
+      "diameter": 5.74
+    },
+    {
+      "spkid": 1000011,
+      "full_name": "101P/Chernykh",
+      "neo": "",
+      "pha": "",
+      "diameter": 5.6
+    },
+    {
+      "spkid": 1000003,
+      "full_name": "47P/Ashbrook-Jackson",
+      "neo": "",
+      "pha": "",
+      "diameter": 5.6
+    },
+    {
+      "spkid": 1000091,
+      "full_name": "98P/Takamizawa",
+      "neo": "",
+      "pha": "",
+      "diameter": 5.4
+    },
+    {
+      "spkid": 1000069,
+      "full_name": "7P/Pons-Winnecke",
+      "neo": "Y",
+      "pha": "",
+      "diameter": 5.2
+    }
+  ]
