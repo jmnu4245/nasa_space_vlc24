@@ -4,11 +4,17 @@ import Planeta from './Planeta.js';
 
 const scene = new THREE.Scene();
 
-// Camera
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 8;
-camera.position.x = 2;
-camera.position.y = 2;
+    // Camera
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    //Fondo
+    const loader = new THREE.TextureLoader();
+    loader.load('./../entorno/fondo.jpg', function(texture) {
+    const geometry = new THREE.SphereGeometry(500, 60, 40); // Tamaño grande
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
+    const skybox = new THREE.Mesh(geometry, material);
+    scene.add(skybox);});
+ 
 
 // Renderer
 const renderer = new THREE.WebGLRenderer();
@@ -71,13 +77,21 @@ const pointLight = new THREE.PointLight(0xffffff, 1, 100);
 pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
-// Camara
-setupCameraControls(camera, renderer);
+    //Movimiento Camara
+    setupCameraControls(camera, renderer);
 
-// Animación
-function animate() {
+
+    // Evento de clic
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+
+    // Animation loop
+    function animate() {
     requestAnimationFrame(animate);
-    renderer.render(scene, camera);
-}
 
-animate();
+    // Renderizar la escena
+    renderer.render(scene, camera);
+    }
+    animate();

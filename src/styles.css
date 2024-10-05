@@ -14,3 +14,54 @@ body {
     align-items: center;
     font-size: 2rem;
 }
+/* Estilos para el menú lateral */
+.sidebar {
+  height: 100%; /* Ocupa el 100% de la altura */
+  width: 0; /* Comienza oculto (ancho 0) */
+  position: fixed; /* Fijo al lado izquierdo */
+  top: 0;
+  left: 0;
+  background-color: #111; /* Color de fondo oscuro */
+  overflow-x: hidden; /* Ocultar scroll horizontal */
+  transition: 0.5s; /* Transición suave */
+  padding-top: 60px; /* Espacio arriba */
+}
+
+.sidebar a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  color: #f1f1f1;
+}
+
+/* Botón cerrar */
+#closeMenu {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 36px;
+  color: white;
+  background: none;
+  border: none;
+}
+
+/* Cuando el menú está visible */
+.sidebar.open {
+  width: 250px; /* Ancho del menú cuando está abierto */
+}
+
+/* Ocultar el botón de abrir menú */
+#openMenu {
+  display: none; /* Oculto completamente */
+}
+
+body {
+  font-family: "Lato", sans-serif;
+}
+
