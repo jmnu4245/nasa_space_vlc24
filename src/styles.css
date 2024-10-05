@@ -1,0 +1,16 @@
+body {
+    margin: 0; /* Elimina el margen predeterminado del body */
+    overflow: hidden; /* Evita el scroll de la página */
+    height: 100vh; /* Establece la altura del body al 100% de la ventana */
+}
+
+.zoomable {
+    transform-origin: center; /* Establece el punto de origen del zoom */
+    transition: transform 0.2s; /* Suaviza la transición */
+    width: 100vw; /* Ocupa todo el ancho de la ventana */
+    height: 100vh; /* Ocupa toda la altura de la ventana */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
