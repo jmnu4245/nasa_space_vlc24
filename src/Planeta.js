@@ -1,5 +1,5 @@
 const SCALE = 62;
-
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 class Planeta {
     constructor(tamaño, posicion, textura, velocidadRotacion) {
     this.tamaño = tamaño;
@@ -18,6 +18,13 @@ class Planeta {
         }
     }
     
+    setPlaneta = function(){
+        const geometry = new THREE.SphereGeometry(this.tamaño, 32, 32);
+        const material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(this.textura) });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.set(...this.posicion);
+        return sphere;
+    }
         
 }
 export default Planeta; // Exportar la clase Planeta

@@ -1,5 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
-import Planeta from './Planeta.js'; // Importar la clase Planeta
+import Planeta from './src/Planeta.js'; // Importar la clase Planeta
 
 function createSphere() {
     // Crear la escena
@@ -14,6 +14,14 @@ function createSphere() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+    
+    const texturas = ['texturas/utextura_mercurio.jpg', 'texturas/textra_venus.jpg', 'texturas/textura_tierra.jpg', 'texturas/textura_marte.jpg', 'texturas/textura_jupiter.jpg', 'texturas/textura_saturno.jpg', 'texturas/textura_urano.jpg', 'texturas/textura_neptuno.jpg'];
+    
+    let planetas = zeros(8);
+    for (let i = 0; i < 8; i++) {
+        let planeta = new Planeta(texturas[i]);
+        planetas[i] = planeta;
+    }
     // Crear una instancia de Planeta
     const marte = new Planeta(1, [1, 0, 0], 'texturas/textura_marte.jpg');
 
