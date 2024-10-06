@@ -74,9 +74,11 @@
       </div>
     </div>
     <script>
-      function selectPlanet(index){
-        n_planetasel =index;
-      }
+      function selectPlanet(index) {
+    n_planetasel = index; // Asigna el índice del planeta seleccionado
+    localStorage.setItem('n_planetasel', n_planetasel); // Guarda el valor en localStorage
+    location.reload(); // Recarga la página
+}
       // Función para actualizar el valor mostrado en el slider de asteroides
       function updateAsteroidCount(value) {
           document.getElementById('asteroids-value').textContent = value;

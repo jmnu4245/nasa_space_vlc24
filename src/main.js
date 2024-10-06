@@ -1,5 +1,5 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
-import { setupCameraControls } from './cameracontrol.js';
+import {updateCameraPosition} from './cameracontrol.js';
 import Planeta from './Planeta.js';
 import Anillos from './Anillos.js';
 import CelestialBody from '../asteroides/CelestialBody.js';
@@ -176,14 +176,17 @@ createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 
 
 // main.js
-let n_planetasel = 0; // Variable para almacenar el índice del planeta seleccionado (inicialmente -1)
+let n_planetasel = localStorage.getItem('n_planetasel') ? parseInt(localStorage.getItem('n_planetasel')) : 0; // Carga el valor del localStorage o establece 0 si no existe
 console.log(n_planetasel);
 // Movimiento Camara planeta
 let selectedplanet = planetas[n_planetasel];
-let rSelPlanet = selectedplanet.tamaño;
+let radius = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
+let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]);
 
-setupCameraControls(camera, renderer, scene, rSelPlanet, posSelPlanet);
+
+let theta = 0; // Ángulo inicial en el plano XY
+let phi = Math.PI/2; // Ángulo inicial en el plano Z
 
 // Evento de clic
 const raycaster = new THREE.Raycaster();
@@ -198,9 +201,11 @@ function animate() {
         sphere[i].rotation.y += planetas[i].velocidadRotacion;
         actualizarPosicionPlanetas(celestialbodies, sphere, tiempo);
     }
-    
     tiempo += TIME_SCALE;
-    // Renderizar la escena
+    posSelPlanet = selectedplanet.posicion;
+    center =sphere[n_planetasel].position;
+    
+    updateCameraPosition(camera,center,radius,phi,theta);
     renderer.render(scene, camera);
 }
 animate();
@@ -225,5 +230,49 @@ function actualizarPosicionPlanetas(cuerposCelestes, esferas, tiempo) {
     for (let i = 1; i < cuerposCelestes.length; i++) { // Empezar desde 1 para omitir el Sol
         const [x, y, z] = cuerposCelestes[i].xyz_orbita_plano_ecliptica(tiempo);
         esferas[i].position.set(x * SCALE_DISTANCE, y * SCALE_DISTANCE, z * SCALE_DISTANCE);
+
     }
 }
+    let isDragging = false;    let previousMousePosition = { x: 0, y: 0 };    let minZoom = 4*radius;let maxZoom = radius*100; //Máx y min de zoom
+    radius = radius*5; // Radio inicial de la esfera
+    let zoomSpeed = 0.005*radius; // Velocidad de zoom
+    let movementScale = 0.02/radius ;
+
+    // Manejar eventos del mouse para la rotación
+    window.addEventListener('mousedown', (event) => {
+        isDragging = true;
+
+    });
+
+    window.addEventListener('mouseup', (event) => {
+        isDragging = false;
+    });
+
+    window.addEventListener('mousemove', (event) => {
+        if (isDragging) {
+            const deltaMove = {
+                x: event.clientX - previousMousePosition.x,
+                y: event.clientY - previousMousePosition.y
+            };
+        
+            theta += deltaMove.x * movementScale; // Rotación en Y
+            phi -= deltaMove.y * movementScale; // Rotación en X
+
+            // Limitar el ángulo phi para evitar voltear la cámara
+            const maxPhi = Math.PI -0.1; // Máximo 180 grados
+            const minPhi =  0.1; // Mínimo 0 grados
+            phi = Math.max(minPhi, Math.min(maxPhi, phi));
+
+            // Actualizar la posición de la cámara
+            updateCameraPosition(camera,center,radius,phi,theta);
+        }
+        previousMousePosition = { x: event.clientX, y: event.clientY };
+    });
+
+    // Manejar el zoom con el scroll del mouse
+    window.addEventListener('wheel', (event) => {
+        event.preventDefault();
+        radius += event.deltaY * zoomSpeed;
+        radius = Math.max(minZoom, Math.min(maxZoom, radius));
+        updateCameraPosition(camera,center,radius,phi,theta);
+    });
