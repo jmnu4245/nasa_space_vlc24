@@ -101,11 +101,23 @@ const celestialbodies = [
     new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 96.9, 142.2, 0, 0.01),
     new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 273.2, 256.2, 0, 0.006)
 ];
+const color = [
+    0xffff00, // Sol (no se usa)
+    0xaaaaaa, // Mercurio
+    0xffa500, // Venus
+    0x0000ff, // Tierra
+    0xff0000, // Marte
+    0xffa500, // Júpiter
+    0xffff00, // Saturno
+    0x00ffff, // Urano
+    0x0000ff  // Neptuno
+];
 
 let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
 let numPuntosOrbita = 10000;
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
+
 
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
@@ -115,7 +127,7 @@ for (let i = 0; i < 9; i++) {
         if (i == 8) {
             numPuntosOrbita *= 100;
         }
-        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, tiempoTotalOrbita[i]);
+        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, tiempoTotalOrbita[i],color[i]);
         scene.add(orbitas[i-1]);
     }
     scene.add(sphere[i]);
@@ -132,7 +144,7 @@ pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
 // Movimiento Camara planeta
-let selectedplanet = planetas[3];
+let selectedplanet = planetas[5];
 let rSelPlanet = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
 
@@ -157,7 +169,7 @@ function animate() {
 }
 animate();
 
-function crearOrbita(cuerpoCeleste, numPuntos, escala, tiempoTotal) {
+function crearOrbita(cuerpoCeleste, numPuntos, escala, tiempoTotal,color) {
     const puntos = []; 
 
     for (let i = 0; i <= numPuntos; i++) {
@@ -167,7 +179,7 @@ function crearOrbita(cuerpoCeleste, numPuntos, escala, tiempoTotal) {
     }
 
     const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
-    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const material = new THREE.LineBasicMaterial({ color: color });
     const orbita = new THREE.Line(geometria, material);
 
     return orbita;
