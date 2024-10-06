@@ -39,7 +39,7 @@ const texturas = [
 
 const SCALE_SIZE = 0.00001436; // Factor de escala para los tamaños
 const SCALE_DISTANCE = 50;    // Factor de escala para las distancias
-const TIME_SCALE = 0.01;      // Factor de escala para el tiempo
+const TIME_SCALE = 0.001;      // Factor de escala para el tiempo
 
 const posIni = [
     [0, 0, 0],            // Sol
@@ -101,21 +101,35 @@ const celestialbodies = [
     new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 96.9, 142.2, 0, 0.01),
     new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 273.2, 256.2, 0, 0.006)
 ];
+const color = [
+    0xffff00, // Sol (no se usa)
+    0xaaaaaa, // Mercurio
+    0xffa500, // Venus
+    0x0000ff, // Tierra
+    0xff0000, // Marte
+    0xffa500, // Júpiter
+    0xffff00, // Saturno
+    0x00ffff, // Urano
+    0x0000ff  // Neptuno
+];
 
 let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
 let numPuntosOrbita = 10000;
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
+const JD_START = 2451544.5; // 1 de enero de 2000
+const JD_END = 2451910.5;   // 31 de diciembre de 2000
+
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
     planetas[i] = planeta;
     sphere[i] = planetas[i].setPlaneta();
     if (i !== 0) {
-        if (i ==8) {
+        if (i == 8) {
             numPuntosOrbita *= 100;
         }
-        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, tiempoTotalOrbita[i]);
+        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, JD_START, JD_END, color[i]);
         scene.add(orbitas[i-1]);
     }
     scene.add(sphere[i]);
@@ -124,17 +138,8 @@ for (let i = 0; i < 9; i++) {
 // Crear los anillos de Saturno y añadirlos como hijos de Saturno
 let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', size[6]);
 
-
-
 // Crear luz
-let intensity1=1;
-const sunLight = new THREE.DirectionalLight(0xffffff, intensity1); // Luz blanca con intensidad 1
-sunLight.position.set(0, 0, 0); // La luz en la misma posición que el sol
-scene.add(sunLight);
-// Crear una fuente de luz puntual en la misma posición que el sol
-
-// Opcional: Añadir una luz ambiental suave para no tener sombras demasiado oscuras
-const ambientLight = new THREE.AmbientLight(0x404040);  // Luz ambiental suave
+const ambientLight = new THREE.AmbientLight(0x404040); // Luz ambiental suave
 scene.add(ambientLight);
 
 //iluminaciónsol
@@ -174,19 +179,18 @@ createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 let n_planetasel = 0; // Variable para almacenar el índice del planeta seleccionado (inicialmente -1)
 console.log(n_planetasel);
 // Movimiento Camara planeta
-let selectedplanet=planetas[n_planetasel];
-let rSelPlanet=selectedplanet.tamaño;
-let posSelPlanet=selectedplanet.posicion;
+let selectedplanet = planetas[n_planetasel];
+let rSelPlanet = selectedplanet.tamaño;
+let posSelPlanet = selectedplanet.posicion;
 
-
-setupCameraControls(camera, renderer, scene, rSelPlanet,posSelPlanet);
+setupCameraControls(camera, renderer, scene, rSelPlanet, posSelPlanet);
 
 // Evento de clic
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 // Animation loop
-let tiempo = 0;
+let tiempo = JD_START;
 function animate() {
     requestAnimationFrame(animate);
 
@@ -201,17 +205,17 @@ function animate() {
 }
 animate();
 
-function crearOrbita(cuerpoCeleste, numPuntos, escala, tiempoTotal) {
+function crearOrbita(cuerpoCeleste, numPuntos, escala, jdStart, jdEnd, color) {
     const puntos = []; 
 
     for (let i = 0; i <= numPuntos; i++) {
-        let t = (i / numPuntos) * tiempoTotal;
-        let [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
+        const t = jdStart + (i / numPuntos) * (jdEnd - jdStart);
+        const [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
         puntos.push(new THREE.Vector3(x * escala, y * escala, z * escala));
     }
 
     const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
-    const material = new THREE.LineBasicMaterial({ color: 0xffffff });
+    const material = new THREE.LineBasicMaterial({ color: color });
     const orbita = new THREE.Line(geometria, material);
 
     return orbita;
