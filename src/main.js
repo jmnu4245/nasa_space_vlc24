@@ -118,6 +118,8 @@ let sphere = Array(9).fill(0);
 let numPuntosOrbita = 10000;
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
+const JD_START = 2451544.5; // 1 de enero de 2000
+const JD_END = 2451910.5;   // 31 de diciembre de 2000
 
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
@@ -127,7 +129,7 @@ for (let i = 0; i < 9; i++) {
         if (i == 8) {
             numPuntosOrbita *= 100;
         }
-        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, tiempoTotalOrbita[i],color[i]);
+        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, JD_START, JD_END, color[i]);
         scene.add(orbitas[i-1]);
     }
     scene.add(sphere[i]);
@@ -144,7 +146,7 @@ pointLight.position.set(5, 5, 5);
 scene.add(pointLight);
 
 // Movimiento Camara planeta
-let selectedplanet = planetas[5];
+let selectedplanet = planetas[3];
 let rSelPlanet = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
 
@@ -155,7 +157,7 @@ const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 // Animation loop
-let tiempo = 0;
+let tiempo = JD_START;
 function animate() {
     requestAnimationFrame(animate);
     for (let i = 0; i < planetas.length; i++) {
@@ -169,11 +171,11 @@ function animate() {
 }
 animate();
 
-function crearOrbita(cuerpoCeleste, numPuntos, escala, tiempoTotal,color) {
+function crearOrbita(cuerpoCeleste, numPuntos, escala, jdStart, jdEnd, color) {
     const puntos = []; 
 
     for (let i = 0; i <= numPuntos; i++) {
-        const t = (i / numPuntos) * tiempoTotal;
+        const t = jdStart + (i / numPuntos) * (jdEnd - jdStart);
         const [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
         puntos.push(new THREE.Vector3(x * escala, y * escala, z * escala));
     }
