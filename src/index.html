@@ -14,14 +14,15 @@
       <div class="dropdown">
         <h3>Planetas</h3>
         <div class="dropdown-content">
-          <label onclick="selectPlanet('Mercurio')">Mercurio</label>
-          <label onclick="selectPlanet('Venus')">Venus</label>
-          <label onclick="selectPlanet('Tierra')">Tierra</label>
-          <label onclick="selectPlanet('Marte')">Marte</label>
-          <label onclick="selectPlanet('Júpiter')">Júpiter</label>
-          <label onclick="selectPlanet('Saturno')">Saturno</label>
-          <label onclick="selectPlanet('Urano')">Urano</label>
-          <label onclick="selectPlanet('Neptuno')">Neptuno</label>
+          <label onclick="selectPlanet(0)">Sol</label>
+          <label onclick="selectPlanet(1)">Mercurio</label>
+          <label onclick="selectPlanet(2)">Venus</label>
+          <label onclick="selectPlanet(3)">Tierra</label>
+          <label onclick="selectPlanet(4)">Marte</label>
+          <label onclick="selectPlanet(5)">Júpiter</label>
+          <label onclick="selectPlanet(6)">Saturno</label>
+          <label onclick="selectPlanet(7)">Urano</label>
+          <label onclick="selectPlanet(8)">Neptuno</label>
         </div>
       </div>
 
@@ -71,11 +72,11 @@
           <label><input type="radio" name="metodocalculo" value="Calculos relativistas"> Relatividad</label>
         </div>
       </div>
-      
     </div>
-
-
     <script>
+      function selectPlanet(index){
+        n_planetasel =index;
+      }
       // Función para actualizar el valor mostrado en el slider de asteroides
       function updateAsteroidCount(value) {
           document.getElementById('asteroids-value').textContent = value;

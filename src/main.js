@@ -7,13 +7,13 @@ import CelestialBody from '../asteroides/CelestialBody.js';
 const scene = new THREE.Scene();
 
 // Camera
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 15000);
 camera.position.z = 100;
 
 // Fondo
 const loader = new THREE.TextureLoader();
 loader.load('./../entorno/fondo_8k.jpg', function(texture) {
-    const geometry = new THREE.SphereGeometry(500, 1000, 1000); // Tamaño grande
+    const geometry = new THREE.SphereGeometry(7000, 100, 100); // Tamaño grande
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
     scene.add(skybox);
@@ -78,7 +78,7 @@ const velocidadRotacion = [
     1.4907 * VEL_SCALE
 ];
 const tiempoTotalOrbita = [
-    25.38,  // Sol (rotación)
+    0,  // Sol (rotación)
     87.97,  // Mercurio (traslación)
     224.70, // Venus (traslación)
     365.25, // Tierra (traslación)
@@ -169,8 +169,12 @@ createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 
 
 
+
+// main.js
+let n_planetasel = 0; // Variable para almacenar el índice del planeta seleccionado (inicialmente -1)
+console.log(n_planetasel);
 // Movimiento Camara planeta
-let selectedplanet=planetas[3];
+let selectedplanet=planetas[n_planetasel];
 let rSelPlanet=selectedplanet.tamaño;
 let posSelPlanet=selectedplanet.posicion;
 
@@ -185,7 +189,7 @@ const mouse = new THREE.Vector2();
 let tiempo = 0;
 function animate() {
     requestAnimationFrame(animate);
-    sol.rotation.y+=velocidadRotacion[0];
+
     for (let i = 0; i < planetas.length; i++) {
         sphere[i].rotation.y += planetas[i].velocidadRotacion;
         actualizarPosicionPlanetas(celestialbodies, sphere, tiempo);
@@ -201,8 +205,8 @@ function crearOrbita(cuerpoCeleste, numPuntos, escala, tiempoTotal) {
     const puntos = []; 
 
     for (let i = 0; i <= numPuntos; i++) {
-        const t = (i / numPuntos) * tiempoTotal;
-        const [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
+        let t = (i / numPuntos) * tiempoTotal;
+        let [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
         puntos.push(new THREE.Vector3(x * escala, y * escala, z * escala));
     }
 

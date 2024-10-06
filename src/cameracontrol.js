@@ -1,26 +1,26 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
 // cameraControls.js
-export function setupCameraControls(camera, renderer, scene,rselPlanet,posSelPlanet) {
+export function setupCameraControls(camera, renderer, scene, rselPlanet, posSelPlanet) {
     console.log(rselPlanet);
     console.log(posSelPlanet);
     let isDragging = false;
     let previousMousePosition = { x: 0, y: 0 };
     let minZoom = 4*rselPlanet;let maxZoom = rselPlanet*100; //Máx y min de zoom
      //velocidad de rotación
-    let radius = rselPlanet*2*5; // Radio inicial de la esfera
+    let radius = rselPlanet*5; // Radio inicial de la esfera
     let theta = 0; // Ángulo inicial en el plano XY
     let phi = Math.PI/2; // Ángulo inicial en el plano Z
     let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]);
     
     let zoomSpeed = 0.005*radius; // Velocidad de zoom
-    let movementScale = 0.0015*radius*radius ;
+    let movementScale = 0.02/radius ;
 
     // Función para actualizar la posición de la cámara
     function updateCameraPosition() {
-        camera.position.x = center.x+radius * Math.sin(phi) * Math.cos(theta);
-        camera.position.y = center.y+radius * Math.cos(phi);
-        camera.position.z = center.z+radius * Math.sin(phi) * Math.sin(theta);
+        camera.position.x = center.x+ radius * Math.sin(phi) * Math.cos(theta);
+        camera.position.y = center.y+ radius * Math.cos(phi);
+        camera.position.z = center.z+ radius * Math.sin(phi) * Math.sin(theta);
         camera.lookAt(center); // Siempre mirar al centro
     }
 
