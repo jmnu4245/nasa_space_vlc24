@@ -11,7 +11,7 @@ camera.position.z = 100;
 
 // Fondo
 const loader = new THREE.TextureLoader();
-loader.load('./../entorno/fondo.jpg', function(texture) {
+loader.load('./../entorno/fondo_8k.jpg', function(texture) {
     const geometry = new THREE.SphereGeometry(500, 1000, 1000); // Tamaño grande
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
