@@ -10,11 +10,11 @@ export function setupCameraControls(camera, renderer, scene,rselPlanet,posSelPla
      //velocidad de rotación
     let radius = rselPlanet*2*5; // Radio inicial de la esfera
     let theta = 0; // Ángulo inicial en el plano XY
-    let phi = 0; // Ángulo inicial en el plano Z
+    let phi = Math.PI/2; // Ángulo inicial en el plano Z
     let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]);
     
     let zoomSpeed = 0.005*radius; // Velocidad de zoom
-    let movementScale = 0.015*radius ;
+    let movementScale = 0.0015*radius*radius ;
 
     // Función para actualizar la posición de la cámara
     function updateCameraPosition() {

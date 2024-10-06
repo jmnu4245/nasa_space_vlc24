@@ -12,7 +12,7 @@ camera.position.z = 100;
 // Fondo
 const loader = new THREE.TextureLoader();
 loader.load('./../entorno/fondo.jpg', function(texture) {
-    const geometry = new THREE.SphereGeometry(500, 60, 40); // Tamaño grande
+    const geometry = new THREE.SphereGeometry(500, 1000, 1000); // Tamaño grande
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
     scene.add(skybox);
@@ -80,11 +80,10 @@ let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
 
 
+
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
     planetas[i] = planeta;
-    sphere[i] = planetas[i].setPlaneta();
-    scene.add(sphere[i]);
     sphere[i] = planetas[i].setPlaneta();
     scene.add(sphere[i]);
 }
@@ -92,18 +91,58 @@ for (let i = 0; i < 9; i++) {
 // Crear los anillos de Saturno y añadirlos como hijos de Saturno
 let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', size[6]);
 
-// Crear luz
-const ambientLight = new THREE.AmbientLight(0x404040); // Luz ambiental suave
-scene.add(ambientLight);
-const pointLight = new THREE.PointLight(0xffffff, 1, 100);
-pointLight.position.set(5, 5, 5);
-scene.add(pointLight);
 
-let selectedplanet=planetas[7];
+
+// Crear luz
+let intensity1=1;
+const sunLight = new THREE.DirectionalLight(0xffffff, intensity1); // Luz blanca con intensidad 1
+sunLight.position.set(0, 0, 0); // La luz en la misma posición que el sol
+scene.add(sunLight);
+// Crear una fuente de luz puntual en la misma posición que el sol
+
+// Opcional: Añadir una luz ambiental suave para no tener sombras demasiado oscuras
+const ambientLight = new THREE.AmbientLight(0x404040);  // Luz ambiental suave
+scene.add(ambientLight);
+
+//iluminaciónsol
+const radiussol = 20; // Radio del sol, ajustable dinámicamente
+
+const intensity = 1;
+const distance = 1000;
+const penumbra = 0.4;
+
+// Función para crear y agregar un Spotlight a la escena
+function createSpotLight(position) {
+    const spotLight = new THREE.SpotLight(0xffffff, intensity);
+    spotLight.position.set(position.x, position.y, position.z); // Posición
+    spotLight.target.position.set(0, 0, 0); // Apuntar al centro del sol
+    spotLight.penumbra = penumbra; // Difuminado en los bordes
+    spotLight.distance = distance; // Distancia a la que afecta la luz
+    scene.add(spotLight);
+    scene.add(spotLight.target);
+}
+
+createSpotLight({ x: 0, y: radiussol * 2, z: 0 });
+// Desde abajo
+createSpotLight({ x: 0, y: -radiussol * 2, z: 0 });
+// Desde la izquierda
+createSpotLight({ x: -radiussol * 2, y: 0, z: 0 });
+// Desde la derecha
+createSpotLight({ x: radiussol * 2, y: 0, z: 0 });
+// Desde el frente
+createSpotLight({ x: 0, y: 0, z: radiussol * 2 });
+// Desde atrás
+createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
+
+
+
+// Movimiento Camara planeta
+let selectedplanet=planetas[3];
+;
 let rSelPlanet=selectedplanet.tamaño;
 let posSelPlanet=selectedplanet.posicion;
 
-// Movimiento Camara
+
 setupCameraControls(camera, renderer, scene, rSelPlanet,posSelPlanet);
 
 // Evento de clic
@@ -113,9 +152,8 @@ const mouse = new THREE.Vector2();
 // Animation loop
 function animate() {
     requestAnimationFrame(animate);
+    sol.rotation.y+=velocidadRotacion[0];
     for (let i = 0; i < planetas.length; i++) {
-        sphere[i].rotation.y += planetas[i].velocidadRotacion;
-    }    for (let i = 0; i < planetas.length; i++) {
         sphere[i].rotation.y += planetas[i].velocidadRotacion;
     }
 

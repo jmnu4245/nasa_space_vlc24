@@ -11,16 +11,15 @@ class Planeta {
     cambiarPosicion= function(nuevaPosicion)
     {
         if (nuevaPosicion.length == 3){
-            this.posicion = nuevaPosicion/SCALE
-            ;
+            this.posicion = nuevaPosicion/SCALE;
         }else{
             console.log("Error: la nueva posición no tiene tres componentes");
         }
     }
     
     setPlaneta = function(){
-        const geometry = new THREE.SphereGeometry(this.tamaño, 32, 32);
-        const material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(this.textura) });
+        const geometry = new THREE.SphereGeometry(this.tamaño, 64, 64);
+        const material = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(this.textura) });
         const sphere = new THREE.Mesh(geometry, material);
         sphere.position.set(...this.posicion);
         return sphere;
