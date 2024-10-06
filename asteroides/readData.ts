@@ -1,7 +1,7 @@
-import { CelestialBody } from './operations';
+import { CelestialBody } from './CelestialBody';
 const fs = require('fs');
 
-function read_celestial_bodies(url: string, n: number): CelestialBody[] {
+export function read_celestial_bodies(url:string , n:number){
     let celestialBodies: CelestialBody[] = [];
     // Leer el archivo JSON
     const data = fs.readFileSync(url, 'utf8');
@@ -17,5 +17,4 @@ function read_celestial_bodies(url: string, n: number): CelestialBody[] {
     return celestialBodies;
 }
 
-const datos: CelestialBody[] = read_celestial_bodies('comets2_ordenado.json', 2);
-console.log(datos);
+
