@@ -138,7 +138,6 @@ createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 
 // Movimiento Camara planeta
 let selectedplanet=planetas[3];
-;
 let rSelPlanet=selectedplanet.tamaño;
 let posSelPlanet=selectedplanet.posicion;
 

@@ -1,67 +1,109 @@
 body {
-    margin: 0; /* Elimina el margen predeterminado del body */
-    overflow: hidden; /* Evita el scroll de la página */
-    height: 100vh; /* Establece la altura del body al 100% de la ventana */
+  margin: 0; /* Elimina el margen predeterminado del body */
+  overflow: hidden; /* Evita el scroll de la página */
+  height: 100vh; /* Establece la altura del body al 100% de la ventana */
+  font-family: 'Roboto', sans-serif; /* Aplica la fuente Poppins */
 }
 
 .zoomable {
-    transform-origin: center; /* Establece el punto de origen del zoom */
-    transition: transform 0.2s; /* Suaviza la transición */
-    width: 100vw; /* Ocupa todo el ancho de la ventana */
-    height: 100vh; /* Ocupa toda la altura de la ventana */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
+  transform-origin: center; /* Establece el punto de origen del zoom */
+  transition: transform 0.2s; /* Suaviza la transición */
+  width: 100vw; /* Ocupa todo el ancho de la ventana */
+  height: 100vh; /* Ocupa toda la altura de la ventana */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
 }
-/* Estilos para el menú lateral */
-.sidebar {
-  height: 100%; /* Ocupa el 100% de la altura */
-  width: 0; /* Comienza oculto (ancho 0) */
-  position: fixed; /* Fijo al lado izquierdo */
+
+#menu {
+  position: fixed;
   top: 0;
-  left: 0;
-  background-color: #111; /* Color de fondo oscuro */
-  overflow-x: hidden; /* Ocultar scroll horizontal */
-  transition: 0.5s; /* Transición suave */
-  padding-top: 60px; /* Espacio arriba */
-}
-
-.sidebar a {
-  padding: 8px 8px 8px 32px;
-  text-decoration: none;
-  font-size: 25px;
+  right: 0;
+  width: 200px;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Transparente */
   color: white;
-  display: block;
-  transition: 0.3s;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 1000; /* Se asegura de estar sobre el contenido */
 }
 
-.sidebar a:hover {
-  color: #f1f1f1;
+/* Contenido principal */
+#content {
+  padding: 20px;
+  background-color: #f4f4f4;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
 }
 
-/* Botón cerrar */
-#closeMenu {
-  position: absolute;
-  top: 10px;
-  right: 25px;
-  font-size: 36px;
-  color: white;
-  background: none;
-  border: none;
+/* Estilos generales de los desplegables */
+.dropdown {
+  margin-bottom: 20px;
 }
 
-/* Cuando el menú está visible */
-.sidebar.open {
-  width: 250px; /* Ancho del menú cuando está abierto */
+.dropdown h3 {
+  cursor: pointer;
+  padding: 10px;
+  background-color: #4a4a4a;
+  border-radius: 5px;
+  margin: 0;
+  font-size: 18px;
+  color: #fff;
+  text-align: center;
+  transition: background-color 0.3s;
 }
 
-/* Ocultar el botón de abrir menú */
-#openMenu {
-  display: none; /* Oculto completamente */
+.dropdown h3:hover {
+  background-color: #565656; /* Color cuando se pasa el ratón */
 }
 
-body {
-  font-family: "Lato", sans-serif;
+.dropdown-content label {
+  display: block; /* Cada etiqueta en nueva línea */
+  margin-bottom: 8px; /* Espacio entre las opciones */
+}
+.dropdown-content {
+  display: none; /* Oculta el contenido por defecto */
+  margin-top: 10px;
+  padding-left: 10px;
+  transition: max-height 0.3s ease;
+  /* Asegúrate de que cada contenido esté en una nueva línea */
+  clear: both; /* Asegura que el contenido empiece en una nueva línea */
 }
 
+.dropdown-content label:hover {
+  color: #00bcd4; /* Cambia el color al pasar el ratón */
+}
+
+/* Estilo del slider */
+.slider-container {
+  margin-top: 10px;
+}
+
+.slider {
+  width: 100%; /* Ancho completo */
+  height: 10px; /* Altura de la barra */
+  background: #4a4a4a; /* Color de fondo de la barra */
+  border-radius: 5px; /* Bordes redondeados */
+  outline: none; /* Sin contorno al seleccionar */
+  opacity: 0.7; /* Opacidad */
+  transition: opacity 0.2s; /* Transición suave para la opacidad */
+}
+.slider:hover {
+  opacity: 1; /* Aumenta la opacidad al pasar el ratón */
+}
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Oculta el estilo predeterminado */
+  appearance: none; /* Para otros navegadores */
+  width: 20px; /* Ancho del "thumb" */
+  height: 20px; /* Altura del "thumb" */
+  border-radius: 50%; /* Bordes redondeados */
+  background: #00bcd4; /* Color del "thumb" */
+  cursor: pointer; /* Cambia el cursor al pasar el ratón */
+  transition: background 0.3s; /* Transición para el color del "thumb" */
+}
+
+/* Efecto al pasar el ratón sobre el "thumb" */
+.slider::-webkit-slider-thumb:hover {
+  background: #0097a7; /* Color del "thumb" al pasar el ratón */
+}
