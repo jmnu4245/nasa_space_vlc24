@@ -7,7 +7,7 @@ import CelestialBody from '../asteroides/CelestialBody.js';
 const scene = new THREE.Scene();
 
 // Camera
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 14000); // Aumentar la distancia de recorte
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200000); // Aumentar la distancia de recorte
 camera.position.z = 100;
 
 // Fondo
