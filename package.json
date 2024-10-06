@@ -2,5 +2,8 @@
   "dependencies": {
     "@types/three": "^0.169.0",
     "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4"
   }
 }
