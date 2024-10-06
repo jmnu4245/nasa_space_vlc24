@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import apiHandler from './apiHandler';
 
 import { fetchData } from './apiHandler';
-import { CelestialBody} from './operations';
+import { CelestialBody} from './CelestialBody';
 
 const apiUrl = "https://ssd-api.jpl.nasa.gov/sbdb.api";
 const numero_asteroides = 4;
