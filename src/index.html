@@ -4,15 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Three.js Sphere</title>
-    <link rel="stylesheet" href="styles.css ">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- Menú lateral -->
-  <div id="menu">
-    <!-- Planetas -->
-    <div class="dropdown">
-      <h3>Planetas</h3>
-      <div class="dropdown-content">
+
+    <!-- Menú lateral -->
+    <div id="menu">
+      <!-- Planetas -->
+      <div class="dropdown">
+        <h3>Planetas</h3>
+        <div class="dropdown-content">
           <label onclick="selectPlanet('Mercurio')">Mercurio</label>
           <label onclick="selectPlanet('Venus')">Venus</label>
           <label onclick="selectPlanet('Tierra')">Tierra</label>
@@ -21,74 +22,93 @@
           <label onclick="selectPlanet('Saturno')">Saturno</label>
           <label onclick="selectPlanet('Urano')">Urano</label>
           <label onclick="selectPlanet('Neptuno')">Neptuno</label>
+        </div>
       </div>
-  </div>
-    
-  
-    <!-- Asteroides -->
-    <div class="dropdown">
-      <h3>ASTEROIDES</h3>
-      <div class="dropdown-content">
-        <label for="asteroids-range">Cantidad de asteroides:</label>
-        <div class="slider-container">
-          <input type="range" id="asteroids-range" name="asteroids" min="1" max="100" class="slider" oninput="updateAsteroidCount(this.value)">
-          <span id="asteroids-value">50</span>
+
+      <!-- Asteroides -->
+      <div class="dropdown">
+        <h3>ASTEROIDES</h3>
+        <div class="dropdown-content">
+          <label for="asteroids-range">Cantidad de asteroides:</label>
+          <div class="slider-container">
+            <input type="range" id="asteroids-range" name="asteroids" min="1" max="100" class="slider" oninput="updateAsteroidCount(this.value)">
+            <span id="asteroids-value">50</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cometas -->
+      <div class="dropdown">
+        <h3>COMETAS</h3>
+        <div class="dropdown-content">
+          <label for="comets-range">Cantidad de cometas:</label>
+          <div class="slider-container">
+            <input type="range" id="comets-range" name="comets" min="1" max="50" class="slider" oninput="updateCometCount(this.value)">
+            <span id="comets-value">25</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cálculos -->
+      <div class="dropdown">
+        <h3>CÁLCULOS</h3>
+        <div class="dropdown-content">
+          <label><input type="checkbox" name="calculo" value="Velocidad"> Velocidad orbital</label>
+          <label><input type="checkbox" name="calculo" value="Masa"> Masa</label>
+          <label><input type="checkbox" name="calculo" value="Distancia"> Distancia al Sol</label>
+          <label><input type="checkbox" name="calculo" value="Periodo"> Periodo orbital</label>
         </div>
       </div>
     </div>
-  
-    <!-- Cometas -->
-    <div class="dropdown">
-      <h3>COMETAS</h3>
-      <div class="dropdown-content">
-        <label for="comets-range">Cantidad de cometas:</label>
-        <div class="slider-container">
-          <input type="range" id="comets-range" name="comets" min="1" max="50" class="slider" oninput="updateCometCount(this.value)">
-          <span id="comets-value">25</span>
-        </div>
-      </div>
-    </div>
-  
-    <!-- Cálculos -->
-    <div class="dropdown">
-      <h3>CÁLCULOS</h3>
-      <div class="dropdown-content">
-        <label><input type="checkbox" name="calculo" value="Velocidad"> Velocidad orbital</label>
-        <label><input type="checkbox" name="calculo" value="Masa"> Masa</label>
-        <label><input type="checkbox" name="calculo" value="Distancia"> Distancia al Sol</label>
-        <label><input type="checkbox" name="calculo" value="Periodo"> Periodo orbital</label>
-      </div>
-    </div>
-  </div>
-  
+
+
   <script>
-    // Función para desplegar o contraer los menús, asegurándose que solo uno se despliegue a la vez
-    document.querySelectorAll('.dropdown h3').forEach((dropdown) => {
-      dropdown.addEventListener('click', () => {
-        const content = dropdown.nextElementSibling;
-  
-        // Cerrar todos los demás menús
-        document.querySelectorAll('.dropdown-content').forEach((otherContent) => {
-          if (otherContent !== content) {
-            otherContent.style.display = 'none';
-          }
-        });
-  
-        // Alternar el estado del menú actual (abrir/cerrar)
-        content.style.display = content.style.display === 'block' ? 'none' : 'block';
-      });
-    });
-  
-    // Actualizar el valor mostrado en el slider de asteroides
-    function updateAsteroidCount(value) {
-      document.getElementById('asteroids-value').textContent = value;
+    // Función para actualizar el valor mostrado en el slider de asteroides
+// Función para actualizar el valor mostrado en el slider de asteroides
+function updateAsteroidCount(value) {
+  document.getElementById('asteroids-value').textContent = value;
+}
+
+// Función para actualizar el valor mostrado en el slider de cometas
+function updateCometCount(value) {
+  document.getElementById('comets-value').textContent = value;
+}
+
+// Función para alternar el despliegue de los menús
+function toggleDropdown(clickedHeader) {
+  // Obtiene todos los contenidos del menú
+  const allContents = document.querySelectorAll('.dropdown-content');
+
+  // Cierra todos los contenidos, excepto el que se ha clicado
+  allContents.forEach(content => {
+    if (content !== clickedHeader.nextElementSibling) {
+      content.classList.remove('show'); // Cierra el menú si está abierto
     }
-  
-    // Actualizar el valor mostrado en el slider de cometas
-    function updateCometCount(value) {
-      document.getElementById('comets-value').textContent = value;
-    }
+  });
+
+  // Alterna la clase 'show' en el contenido asociado al encabezado clicado
+  const content = clickedHeader.nextElementSibling;
+  content.classList.toggle('show');
+}
+
+// Evitar que el evento de movimiento del slider propague al menú
+const sliders = document.querySelectorAll('.slider');
+sliders.forEach(slider => {
+  slider.addEventListener('input', function(event) {
+    event.stopPropagation(); // Detiene la propagación del evento
+  });
+});
+
+// Añadir evento de clic a los encabezados de los menús desplegables
+const dropdownHeaders = document.querySelectorAll('.dropdown h3');
+dropdownHeaders.forEach(header => {
+  header.addEventListener('click', function() {
+    toggleDropdown(header); // Llama a la función para alternar el desplegable
+  });
+});
+
+
   </script>
-    <script type="module" src="./main.js"></script>
+  <script type="module" src="./main.js"></script>
 </body>
 </html>

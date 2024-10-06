@@ -1,10 +1,20 @@
+/* Reset de márgenes y configuración del body */
 body {
   margin: 0; /* Elimina el margen predeterminado del body */
   overflow: hidden; /* Evita el scroll de la página */
   height: 100vh; /* Establece la altura del body al 100% de la ventana */
-  font-family: 'Roboto', sans-serif; /* Aplica la fuente Poppins */
+  font-family: 'Roboto', sans-serif; /* Aplica la fuente Roboto */
 }
 
+/* Estilo del contenido principal */
+#content {
+  padding: 20px;
+  background-color: #f4f4f4;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+}
+
+/* Estilo de los elementos zoomables */
 .zoomable {
   transform-origin: center; /* Establece el punto de origen del zoom */
   transition: transform 0.2s; /* Suaviza la transición */
@@ -16,6 +26,7 @@ body {
   font-size: 2rem;
 }
 
+/* Estilo del menú */
 #menu {
   position: fixed;
   top: 0;
@@ -39,36 +50,47 @@ body {
 
 /* Estilos generales de los desplegables */
 .dropdown {
-  margin-bottom: 20px;
+  margin-bottom: 20px; /* Espacio entre cada dropdown */
 }
 
+/* Estilo de los encabezados de los desplegables */
 .dropdown h3 {
   cursor: pointer;
   padding: 10px;
-  background-color: #4a4a4a;
-  border-radius: 5px;
-  margin: 0;
-  font-size: 18px;
-  color: #fff;
-  text-align: center;
-  transition: background-color 0.3s;
+  background-color: #4a4a4a; /* Color de fondo */
+  border-radius: 5px; /* Bordes redondeados */
+  margin: 0; /* Elimina el margen por defecto */
+  font-size: 18px; /* Tamaño de fuente */
+  color: #fff; /* Color de texto */
+  text-align: center; /* Alineación centrada */
+  transition: background-color 0.3s; /* Transición suave */
 }
 
 .dropdown h3:hover {
-  background-color: #565656; /* Color cuando se pasa el ratón */
+  background-color: #565656; /* Color al pasar el ratón */
 }
 
+/* Contenido del menú desplegable */
+.dropdown-content {
+  display: none; /* Esconde los submenús por defecto */
+  margin-top: 10px; /* Espacio superior */
+  padding: 10px; /* Relleno interno */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: max-height 0.3s ease;
+}
+
+/* Muestra el contenido cuando se le agrega la clase 'show' */
+.dropdown-content.show {
+  display: block; /* Muestra los submenús */
+}
+
+/* Estilo de las etiquetas en el menú desplegable */
 .dropdown-content label {
   display: block; /* Cada etiqueta en nueva línea */
   margin-bottom: 8px; /* Espacio entre las opciones */
-}
-.dropdown-content {
-  display: none; /* Oculta el contenido por defecto */
-  margin-top: 10px;
-  padding-left: 10px;
-  transition: max-height 0.3s ease;
-  /* Asegúrate de que cada contenido esté en una nueva línea */
-  clear: both; /* Asegura que el contenido empiece en una nueva línea */
+  color: #fff; /* Color de texto */
+  cursor: pointer; /* Cambia el cursor al pasar el ratón */
 }
 
 .dropdown-content label:hover {
@@ -77,7 +99,7 @@ body {
 
 /* Estilo del slider */
 .slider-container {
-  margin-top: 10px;
+  margin-top: 10px; /* Espacio superior para el slider */
 }
 
 .slider {
@@ -89,9 +111,12 @@ body {
   opacity: 0.7; /* Opacidad */
   transition: opacity 0.2s; /* Transición suave para la opacidad */
 }
+
 .slider:hover {
   opacity: 1; /* Aumenta la opacidad al pasar el ratón */
 }
+
+/* Estilo del thumb del slider */
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none; /* Oculta el estilo predeterminado */
   appearance: none; /* Para otros navegadores */
@@ -103,7 +128,6 @@ body {
   transition: background 0.3s; /* Transición para el color del "thumb" */
 }
 
-/* Efecto al pasar el ratón sobre el "thumb" */
 .slider::-webkit-slider-thumb:hover {
   background: #0097a7; /* Color del "thumb" al pasar el ratón */
 }
