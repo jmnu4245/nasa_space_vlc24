@@ -97,6 +97,16 @@ body {
   color: #00bcd4; /* Cambia el color al pasar el ratón */
 }
 
+.dropdown-subcontent {
+  display: none; /* Oculta el submenú por defecto */
+  margin-top: 10px; /* Espacio adicional arriba del submenú */
+  padding-left: 10px; /* Margen interno a la izquierda */
+}
+
+.dropdown-subcontent.show {
+  display: block; /* Muestra el submenú cuando se le agrega la clase 'show' */
+}
+
 /* Estilo del slider */
 .slider-container {
   margin-top: 10px; /* Espacio superior para el slider */

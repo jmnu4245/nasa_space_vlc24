@@ -59,56 +59,89 @@
           <label><input type="checkbox" name="calculo" value="Periodo"> Periodo orbital</label>
         </div>
       </div>
+      <div class="dropdown">
+        <h3>MÉTODO DE CÁLCULO</h3>
+        <div class="dropdown-content">
+          <label><input type="radio" name="metodocalculo" value="Leyes de Kepler"> Leyes de Kepler</label>
+          <label><input type="radio" name="metodocalculo" value="Mecánica Clásica" class="toggle-submenu"> Mecánica Clásica</label>
+          <div class="dropdown-subcontent">
+            <label><input type="checkbox" name="mcN" value="Distancia"> Método de Euler</label>
+            <label><input type="checkbox" name="mcRK" value="Periodo"> Método de Runge-Kuta4</label>
+          </div>
+          <label><input type="radio" name="metodocalculo" value="Calculos relativistas"> Relatividad</label>
+        </div>
+      </div>
+      
     </div>
 
 
-  <script>
-    // Función para actualizar el valor mostrado en el slider de asteroides
-// Función para actualizar el valor mostrado en el slider de asteroides
-function updateAsteroidCount(value) {
-  document.getElementById('asteroids-value').textContent = value;
-}
-
-// Función para actualizar el valor mostrado en el slider de cometas
-function updateCometCount(value) {
-  document.getElementById('comets-value').textContent = value;
-}
-
-// Función para alternar el despliegue de los menús
-function toggleDropdown(clickedHeader) {
-  // Obtiene todos los contenidos del menú
-  const allContents = document.querySelectorAll('.dropdown-content');
-
-  // Cierra todos los contenidos, excepto el que se ha clicado
-  allContents.forEach(content => {
-    if (content !== clickedHeader.nextElementSibling) {
-      content.classList.remove('show'); // Cierra el menú si está abierto
-    }
-  });
-
-  // Alterna la clase 'show' en el contenido asociado al encabezado clicado
-  const content = clickedHeader.nextElementSibling;
-  content.classList.toggle('show');
-}
-
-// Evitar que el evento de movimiento del slider propague al menú
-const sliders = document.querySelectorAll('.slider');
-sliders.forEach(slider => {
-  slider.addEventListener('input', function(event) {
-    event.stopPropagation(); // Detiene la propagación del evento
-  });
-});
-
-// Añadir evento de clic a los encabezados de los menús desplegables
-const dropdownHeaders = document.querySelectorAll('.dropdown h3');
-dropdownHeaders.forEach(header => {
-  header.addEventListener('click', function() {
-    toggleDropdown(header); // Llama a la función para alternar el desplegable
-  });
-});
-
-
+    <script>
+      // Función para actualizar el valor mostrado en el slider de asteroides
+      function updateAsteroidCount(value) {
+          document.getElementById('asteroids-value').textContent = value;
+      }
+  
+      // Función para actualizar el valor mostrado en el slider de cometas
+      function updateCometCount(value) {
+          document.getElementById('comets-value').textContent = value;
+      }
+  
+      // Función para alternar el despliegue de los menús
+      function toggleDropdown(clickedHeader) {
+          const allContents = document.querySelectorAll('.dropdown-content');
+  
+          // Cierra todos los contenidos, excepto el que se ha clicado
+          allContents.forEach(content => {
+              if (content !== clickedHeader.nextElementSibling) {
+                  content.classList.remove('show'); // Cierra el menú si está abierto
+              }
+          });
+  
+          const content = clickedHeader.nextElementSibling;
+          content.classList.toggle('show');
+      }
+  
+      // Función para alternar el submenú
+      function toggleSubmenu(clickedLabel) {
+          const submenu = clickedLabel.nextElementSibling; // Obtiene el submenú asociado
+  
+          // Cierra cualquier submenú abierto
+          const allSubmenus = document.querySelectorAll('.dropdown-subcontent');
+          allSubmenus.forEach(submenu => {
+              if (submenu !== clickedLabel.nextElementSibling) {
+                  submenu.classList.remove('show'); // Cierra el submenú si está abierto
+              }
+          });
+  
+          // Alterna la clase 'show' en el submenú asociado al label clicado
+          submenu.classList.toggle('show');
+      }
+  
+      // Evitar que el evento de movimiento del slider propague al menú
+      const sliders = document.querySelectorAll('.slider');
+      sliders.forEach(slider => {
+          slider.addEventListener('input', function(event) {
+              event.stopPropagation(); // Detiene la propagación del evento
+          });
+      });
+  
+      // Añadir evento de clic a los encabezados de los menús desplegables
+      const dropdownHeaders = document.querySelectorAll('.dropdown h3');
+      dropdownHeaders.forEach(header => {
+          header.addEventListener('click', function() {
+              toggleDropdown(header); // Llama a la función para alternar el desplegable
+          });
+      });
+  
+      // Añadir evento de clic a las etiquetas del submenú
+      const subMenuHeaders = document.querySelectorAll('.dropdown-content .toggle-submenu');
+      subMenuHeaders.forEach(label => {
+          label.addEventListener('click', function() {
+              toggleSubmenu(label); // Llama a la función para alternar el submenú
+          });
+      });
   </script>
+  
   <script type="module" src="./main.js"></script>
 </body>
 </html>
