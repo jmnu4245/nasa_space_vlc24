@@ -7,13 +7,13 @@ import CelestialBody from '../asteroides/CelestialBody.js';
 const scene = new THREE.Scene();
 
 // Camera
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 15000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 14000); // Aumentar la distancia de recorte
 camera.position.z = 100;
 
 // Fondo
 const loader = new THREE.TextureLoader();
 loader.load('./../entorno/fondo_8k.jpg', function(texture) {
-    const geometry = new THREE.SphereGeometry(7000, 100, 100); // Tamaño grande
+    const geometry = new THREE.SphereGeometry(100000, 100, 100); // Aumentar el tamaño del skybox
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
     scene.add(skybox);
@@ -39,7 +39,16 @@ const texturas = [
 
 const SCALE_SIZE = 0.00001436; // Factor de escala para los tamaños
 const SCALE_DISTANCE = 50;    // Factor de escala para las distancias
-const TIME_SCALE = 0.001;      // Factor de escala para el tiempo
+let TIME_SCALE = 0.001;      // Valor inicial
+
+// Recuperar la velocidad de la simulación desde localStorage
+const savedSpeed = localStorage.getItem('simulationSpeed');
+if (savedSpeed) {
+    TIME_SCALE = parseFloat(savedSpeed) / (60 * 60); // Convertir días por minuto a días por segundo
+    document.getElementById('speed-range').value = savedSpeed;
+    document.getElementById('speed-value').textContent = savedSpeed;
+    console.log(`Loaded speed: ${savedSpeed}`);
+}
 
 const posIni = [
     [0, 0, 0],            // Sol
@@ -65,20 +74,8 @@ const size = [
     24622 * SCALE_SIZE    // Neptuno
 ];
 
-const VEL_SCALE = 0.000184; // Factor de escala para las velocidades,0.000184 1 vuelta por minuto
-const velocidadRotacion = [
-    0.0394 * VEL_SCALE, 
-    0.0171 * VEL_SCALE, 
-    -0.0041 * VEL_SCALE, 
-    1.0 * VEL_SCALE, 
-    0.9756 * VEL_SCALE, 
-    2.4242 * VEL_SCALE, 
-    2.2429 * VEL_SCALE, 
-    -1.3953 * VEL_SCALE, 
-    1.4907 * VEL_SCALE
-];
 const tiempoTotalOrbita = [
-    0,  // Sol (rotación)
+    25.38,  // Sol (rotación)
     87.97,  // Mercurio (traslación)
     224.70, // Venus (traslación)
     365.25, // Tierra (traslación)
@@ -88,8 +85,10 @@ const tiempoTotalOrbita = [
     30685.49, // Urano (traslación)
     60190.03  // Neptuno (traslación)
 ];
-         // Sol lo pongo para poder iterar bien
-    
+
+// Calcular la velocidad de rotación en función del período orbital
+const velocidadRotacion = tiempoTotalOrbita.map(dias => (2 * Math.PI) / (dias / TIME_SCALE));
+
 const celestialbodies = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0),
     new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 29.1, 174.8, 0, 4.15),
@@ -115,7 +114,7 @@ const color = [
 
 let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
-let numPuntosOrbita = 10000;
+let numPuntosOrbita = 10000; // Aumentar el número de puntos en las órbitas
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
 const JD_START = 2451544.5; // 1 de enero de 2000
@@ -173,8 +172,6 @@ createSpotLight({ x: 0, y: 0, z: radiussol * 2 });
 createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 
 
-
-
 // main.js
 let n_planetasel = 0; // Variable para almacenar el índice del planeta seleccionado (inicialmente -1)
 console.log(n_planetasel);
@@ -215,7 +212,7 @@ function crearOrbita(cuerpoCeleste, numPuntos, escala, jdStart, jdEnd, color) {
     }
 
     const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
-    const material = new THREE.LineBasicMaterial({ color: color });
+    const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 }); // Asegurarse de que el material sea visible
     const orbita = new THREE.Line(geometria, material);
 
     return orbita;
@@ -227,3 +224,5 @@ function actualizarPosicionPlanetas(cuerposCelestes, esferas, tiempo) {
         esferas[i].position.set(x * SCALE_DISTANCE, y * SCALE_DISTANCE, z * SCALE_DISTANCE);
     }
 }
+
+
