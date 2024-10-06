@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Three.js Sphere</title>
+    <title>Simulación Espacial</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -50,6 +50,18 @@
         </div>
       </div>
 
+      <!-- Velocidad de la simulación -->
+      <div class="dropdown">
+        <h3>Velocidad de la Simulación</h3>
+        <div class="dropdown-content">
+          <label for="speed-range">Velocidad (días por minuto):</label>
+          <div class="slider-container">
+            <input type="range" id="speed-range" name="speed" min="1" max="10" value="1" class="slider" oninput="updateSimulationSpeed(this.value)">
+            <span id="speed-value">1</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Cálculos -->
       <div class="dropdown">
         <h3>CÁLCULOS</h3>
@@ -89,6 +101,19 @@
           document.getElementById('comets-value').textContent = value;
       }
   
+      // Función para actualizar el valor mostrado en el slider de velocidad de simulación
+      function updateSimulationSpeed(value) {
+          document.getElementById('speed-value').textContent = value;
+
+      }
+  // Función para actualizar la velocidad de la simulación
+      function updateSimulationSpeed(value) {
+          const daysPerMinute = parseFloat(value);
+          TIME_SCALE = daysPerMinute / (60 * 60); // Convertir días por minuto a días por segundo
+          document.getElementById('speed-value').textContent = value; // Actualizar el valor mostrado
+          localStorage.setItem('simulationSpeed', value); // Guardar la velocidad en localStorage
+          location.reload(); // Recargar la página
+      }
       // Función para alternar el despliegue de los menús
       function toggleDropdown(clickedHeader) {
           const allContents = document.querySelectorAll('.dropdown-content');
@@ -145,6 +170,6 @@
       });
   </script>
   
-  <script type="module" src="./main.js"></script>
+  <script type="module" src="main.js"></script>
 </body>
 </html>
