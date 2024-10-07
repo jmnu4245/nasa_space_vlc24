@@ -17,6 +17,6 @@ window.addEventListener('click', (event) => {
         if(intersects[0].object instanceof Planeta){
             sidebar.classList.add('open');
         }
-        intersects[0].object.material.color.set(Math.random() * 0xffffff);
+        console.log(intersects[0].object);
     }
 });

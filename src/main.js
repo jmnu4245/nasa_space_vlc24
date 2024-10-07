@@ -24,6 +24,10 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+//Creación de planetas
+
+//Create planet variables and const
+
 // Create a planet array
 const texturas = [
     '../texturas/textura_sol.jpg',
@@ -137,13 +141,15 @@ for (let i = 0; i < 9; i++) {
 // Crear los anillos de Saturno y añadirlos como hijos de Saturno
 let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', size[6]);
 
-// Crear luz
-const ambientLight = new THREE.AmbientLight(0x404040); // Luz ambiental suave
+// Crear luces
+
+// Luz ambiental suave
+
+const ambientLight = new THREE.AmbientLight(0x404040); 
 scene.add(ambientLight);
 
 //iluminaciónsol
 const radiussol = 20; // Radio del sol, ajustable dinámicamente
-
 const intensity = 1;
 const distance = 1000;
 const penumbra = 0.4;
@@ -172,31 +178,29 @@ createSpotLight({ x: 0, y: 0, z: radiussol * 2 });
 createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 
 
-// main.js
+// Movement of camera
+
+// Selecction of planet from localStorage
 let n_planetasel = localStorage.getItem('n_planetasel') ? parseInt(localStorage.getItem('n_planetasel')) : 0; // Carga el valor del localStorage o establece 0 si no existe
 console.log(n_planetasel);
-// Movimiento Camara planeta
+// Camera parameters
 let selectedplanet = planetas[n_planetasel];
 let radius = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
-let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]);
+let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]); // Center of the followed planet
+let theta = 0; //XY-plane initial angle
+let phi = Math.PI/2; // Z-plane initial angle
 
-
-let theta = 0; // Ángulo inicial en el plano XY
-let phi = Math.PI/2; // Ángulo inicial en el plano Z
-
-// Evento de clic
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
 
 // Animation loop
 let tiempo = JD_START;
 function animate() {
     requestAnimationFrame(animate);
-
+    //planets spin
     for (let i = 0; i < planetas.length; i++) {
-        sphere[i].rotation.y += planetas[i].velocidadRotacion;
         actualizarPosicionPlanetas(celestialbodies, sphere, tiempo);
+        sphere[i].rotation.y += planetas[i].velocidadRotacion;
+       
     }
     tiempo += TIME_SCALE;
     posSelPlanet = selectedplanet.posicion;
@@ -230,46 +234,118 @@ function actualizarPosicionPlanetas(cuerposCelestes, esferas, tiempo) {
 
     }
 }
-    let isDragging = false;    let previousMousePosition = { x: 0, y: 0 };    let minZoom = 4*radius;let maxZoom = radius*100; //Máx y min de zoom
-    radius = radius*5; // Radio inicial de la esfera
-    let zoomSpeed = 0.005*radius; // Velocidad de zoom
-    let movementScale = 0.02/radius ;
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
+let minZoom = 4 * radius;
+let maxZoom = radius * 100; // Max and min zoom
+radius = radius * 5; // Initial radius of the sphere
+let zoomSpeed = 0.005 * radius; // Zoom speed
+let movementScale = 0.02 / radius;
+let previousTouchPosition = { x: 0, y: 0 };
+let initialPinchDistance = null; // Used for pinch zoom
 
-    // Manejar eventos del mouse para la rotación
-    window.addEventListener('mousedown', (event) => {
-        isDragging = true;
 
-    });
 
-    window.addEventListener('mouseup', (event) => {
-        isDragging = false;
-    });
+// Helper function to get the distance between two touch points
+function getTouchDistance(touch1, touch2) {
+  const dx = touch1.pageX - touch2.pageX;
+  const dy = touch1.pageY - touch2.pageY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
 
-    window.addEventListener('mousemove', (event) => {
-        if (isDragging) {
-            const deltaMove = {
-                x: event.clientX - previousMousePosition.x,
-                y: event.clientY - previousMousePosition.y
-            };
-        
-            theta += deltaMove.x * movementScale; // Rotación en Y
-            phi -= deltaMove.y * movementScale; // Rotación en X
+// Handle mouse events for desktop
+window.addEventListener('mousedown', (event) => {
+  isDragging = true;
+  previousMousePosition = { x: event.clientX, y: event.clientY };
+});
 
-            // Limitar el ángulo phi para evitar voltear la cámara
-            const maxPhi = Math.PI -0.1; // Máximo 180 grados
-            const minPhi =  0.1; // Mínimo 0 grados
-            phi = Math.max(minPhi, Math.min(maxPhi, phi));
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+});
 
-            // Actualizar la posición de la cámara
-            updateCameraPosition(camera,center,radius,phi,theta);
-        }
-        previousMousePosition = { x: event.clientX, y: event.clientY };
-    });
+window.addEventListener('mousemove', (event) => {
+  if (isDragging) {
+    const deltaMove = {
+      x: event.clientX - previousMousePosition.x,
+      y: event.clientY - previousMousePosition.y,
+    };
 
-    // Manejar el zoom con el scroll del mouse
-    window.addEventListener('wheel', (event) => {
-        event.preventDefault();
-        radius += event.deltaY * zoomSpeed;
-        radius = Math.max(minZoom, Math.min(maxZoom, radius));
-        updateCameraPosition(camera,center,radius,phi,theta);
-    });
+    theta += deltaMove.x * movementScale; // Y-axis rotation
+    phi -= deltaMove.y * movementScale; // X-axis rotation
+
+    // Clamp phi angle to avoid flipping the camera
+    const maxPhi = Math.PI - 0.1;
+    const minPhi = 0.1;
+    phi = Math.max(minPhi, Math.min(maxPhi, phi));
+
+    updateCameraPosition(camera, center, radius, phi, theta);
+    previousMousePosition = { x: event.clientX, y: event.clientY };
+  }
+});
+
+// Handle zoom with mouse wheel
+window.addEventListener('wheel', (event) => {
+  event.preventDefault();
+  radius += event.deltaY * zoomSpeed;
+  radius = Math.max(minZoom, Math.min(maxZoom, radius));
+  updateCameraPosition(camera, center, radius, phi, theta);
+});
+
+// Handle touch events for mobile
+
+// Start touch (similar to mousedown)
+window.addEventListener('touchstart', (event) => {
+  if (event.touches.length === 1) { // Single finger for dragging
+    isDragging = true;
+    previousTouchPosition = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
+    };
+  } else if (event.touches.length === 2) { // Two fingers for pinch zoom
+    isDragging = false; // Disable dragging while pinching
+    initialPinchDistance = getTouchDistance(event.touches[0], event.touches[1]);
+  }
+});
+
+// Touch move (similar to mousemove)
+window.addEventListener('touchmove', (event) => {
+  if (isDragging && event.touches.length === 1) {
+    const currentTouch = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY
+    };
+
+    const deltaMove = {
+      x: currentTouch.x - previousTouchPosition.x,
+      y: currentTouch.y - previousTouchPosition.y,
+    };
+
+    theta += deltaMove.x * movementScale; // Y-axis rotation
+    phi -= deltaMove.y * movementScale; // X-axis rotation
+
+    // Clamp phi angle to avoid flipping the camera
+    const maxPhi = Math.PI - 0.1;
+    const minPhi = 0.1;
+    phi = Math.max(minPhi, Math.min(maxPhi, phi));
+
+    updateCameraPosition(camera, center, radius, phi, theta);
+    previousTouchPosition = { x: currentTouch.x, y: currentTouch.y };
+  } else if (event.touches.length === 2) { // Pinch-to-zoom
+    const newPinchDistance = getTouchDistance(event.touches[0], event.touches[1]);
+    if (initialPinchDistance !== null) {
+      const pinchDelta = newPinchDistance - initialPinchDistance;
+      radius -= pinchDelta * zoomSpeed;
+      radius = Math.max(minZoom, Math.min(maxZoom, radius));
+      updateCameraPosition(camera, center, radius, phi, theta);
+    }
+    initialPinchDistance = newPinchDistance; // Update for next move
+  }
+});
+
+// End touch (similar to mouseup)
+window.addEventListener('touchend', (event) => {
+  if (event.touches.length === 0) {
+    isDragging = false;
+    initialPinchDistance = null;
+  }
+});
