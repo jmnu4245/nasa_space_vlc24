@@ -16,5 +16,3 @@ export function read_celestial_bodies(url:string , n:number){
 
     return celestialBodies;
 }
-
-
