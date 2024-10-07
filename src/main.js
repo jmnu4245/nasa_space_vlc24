@@ -309,6 +309,7 @@ window.addEventListener('touchstart', (event) => {
 
 // Touch move (similar to mousemove)
 window.addEventListener('touchmove', (event) => {
+  event.preventDefault();
   if (isDragging && event.touches.length === 1) {
     const currentTouch = {
       x: event.touches[0].clientX,
