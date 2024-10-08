@@ -95,14 +95,14 @@ const velocidadRotacion = tiempoTotalOrbita.map(dias => (2 * Math.PI) / (dias / 
 
 const celestialbodies = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 174.8, 0, 4.15),
-    new CelestialBody('2', 'Venus', 0.0068, 0.723, 0.718, 3.4, 76.7, 131.6, 50.1, 0, 1.62),
-    new CelestialBody('3', 'Tierra', 0.0167, 1.000, 0.983, 0.0, 0.0, 102.9, 357.5, 0, 0.99),
-    new CelestialBody('4', 'Marte', 0.0934, 1.524, 1.381, 1.9, 49.6, -23.96, 19.4, 0, 0.53),
-    new CelestialBody('5', 'Júpiter', 0.0484, 5.203, 4.951, 1.3, 100.5, 14.73, 20.0, 0, 0.08),
-    new CelestialBody('6', 'Saturno', 0.0542, 9.537, 9.020, 2.5, 113.7, 92.6, 317.0, 0, 0.03),
-    new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 170.95, 142.2, 0, 0.01),
-    new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 44.96, 256.2, 0, 0.006)
+    new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 252.25, 0, 4.15),
+    new CelestialBody('2', 'Venus', 0.0068, 0.723, 0.718, 3.4, 76.7, 131.6, 181.98, 0, 1.62),
+    new CelestialBody('3', 'Tierra', 0.0167, 1.000, 0.983, 0.0, 0.0, 102.9, 100.46, 0, 0.99),
+    new CelestialBody('4', 'Marte', 0.0934, 1.524, 1.381, 1.9, 49.6, -23.96, -4.55, 0, 0.53),
+    new CelestialBody('5', 'Júpiter', 0.0484, 5.203, 4.951, 1.3, 100.5, 14.73, 34.40, 0, 0.08),
+    new CelestialBody('6', 'Saturno', 0.0542, 9.537, 9.020, 2.5, 113.7, 92.6, 49.95, 0, 0.03),
+    new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 170.95, 313.24, 0, 0.01),
+    new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 44.96, -55.12, 0, 0.006)
 ];
 const color = [
     0xffff00, // Sol (no se usa)
