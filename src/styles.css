@@ -6,6 +6,10 @@ body {
   font-family: 'Roboto', sans-serif; /* Aplica la fuente Roboto */
 }
 
+.fecha{
+  padding:10px;
+}
+
 /* Estilo del contenido principal */
 #content {
   padding: 20px;
@@ -31,7 +35,7 @@ body {
   position: fixed;
   top: 0;
   right: 0;
-  width: 200px;
+  width: 250px;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); /* Transparente */
   color: white;
