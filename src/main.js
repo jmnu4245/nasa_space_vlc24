@@ -9,6 +9,8 @@ const scene = new THREE.Scene();
 // Camera
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200000); // Aumentar la distancia de recorte
 camera.position.z = 100;
+  
+
 
 // Fondo
 const loader = new THREE.TextureLoader();
@@ -121,20 +123,16 @@ let sphere = Array(9).fill(0);
 let numPuntosOrbita = 10000; // Aumentar el número de puntos en las órbitas
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
-const JD_START = 2451544.5; // 1 de enero de 2000
-const JD_END = 2451910.5;   // 31 de diciembre de 2000
 
 for (let i = 0; i < 9; i++) {
     let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
     planetas[i] = planeta;
     sphere[i] = planetas[i].setPlaneta();
-    if (i !== 0) {
-        if (i == 8) {
-            numPuntosOrbita *= 100;
-        }
-        orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, JD_START, JD_END, color[i]);
-        scene.add(orbitas[i-1]);
-    }
+    
+    let T = celestialbodies[i].calcular_T();
+    orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, T, color[i]);
+    scene.add(orbitas[i-1]);
+    
     scene.add(sphere[i]);
 }
 
@@ -193,9 +191,7 @@ let phi = Math.PI/2; // Z-plane initial angle
 
 
 // Animation loop
-//let tiempo = JD_START;
 let tiempo = calcularDiaJulianoActual();
-let fecha = "";
 function animate() {
     requestAnimationFrame(animate);
     //planets spin
@@ -204,10 +200,10 @@ function animate() {
         sphere[i].rotation.y += planetas[i].velocidadRotacion;
        
     }
-    tiempo += TIME_SCALE;
     let fecha = julianToDate(tiempo);
     document.getElementById('dia').innerHTML = tiempo.toFixed(2);
     document.getElementById('fecha').innerHTML = fecha;
+    tiempo += TIME_SCALE;
     
 
     posSelPlanet = selectedplanet.posicion;
@@ -268,11 +264,12 @@ function calcularDiaJulianoActual() {
 animate();
 
 
-function crearOrbita(cuerpoCeleste, numPuntos, escala, jdStart, jdEnd, color) {
+function crearOrbita(cuerpoCeleste, numPuntos, escala, T, color) {
     const puntos = []; 
 
+    let t = 0;
     for (let i = 0; i <= numPuntos; i++) {
-        const t = jdStart + (i / numPuntos) * (jdEnd - jdStart);
+        const t =+ (i / numPuntos) * (T);
         const [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
         puntos.push(new THREE.Vector3(x * escala, y * escala, z * escala));
     }

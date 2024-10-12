@@ -13,13 +13,23 @@ class CelestialBody {
         this.n = n; // deg per day
     }
 
+    //cálculo del periodo orbital
+    calcular_T(){
+        const T = 360 / this.n;
+        return T;
+    }
+
+    //cálculo de la anomalía excéntrica
     calcular_E(t) {
         const tol = 1e-6 * Math.PI / 180;
         const max_iterations = 100;
-        const e_deg = this.e* Math.PI / 180;
-        const M_0 = this.L - this.w;
+        const e_deg = this.e;
+        const L = this.L * Math.PI / 180;
+        const w = this.w * Math.PI / 180;
+        const n = this.n * Math.PI / 180;
+        const M_0 = L - w;
 
-        const M = this.n * (t - this.t0) ;
+        const M = n * (t - this.t0) ;
         let E = M_0 - e_deg * Math.sin(M_0);
 
         //M = M % (2 * Math.PI);  Asegurarse de que M esté en el rango [0, 2π]
@@ -66,7 +76,7 @@ class CelestialBody {
         const y = (cos_omega * sin_Omega + sin_omega * cos_Omega * cos_I) * x0 + (-sin_omega * sin_Omega + cos_omega * cos_Omega * cos_I) * y0;
         const z = (sin_omega * sin_I) * x0 + (cos_omega * sin_I) * y0;
 
-        return [x, y, z];
+        return [x, z, y]; //se ha usado distinto SR en los calculos y en la simulación
     }
 }
 
