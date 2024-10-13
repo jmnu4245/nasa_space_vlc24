@@ -1,16 +1,15 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
+import { calcularDiaJulianoActual , julianToDate} from './julianthings.js';
 import {updateCameraPosition} from './cameracontrol.js';
 import Planeta from './Planeta.js';
 import Anillos from './Anillos.js';
-import CelestialBody from '../asteroides/CelestialBody.js';
+import CelestialBody from './CelestialBody.js';
 
+//Inicializar escena
 const scene = new THREE.Scene();
 
 // Camera
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200000); // Aumentar la distancia de recorte
-camera.position.z = 100;
-  
-
 
 // Fondo
 const loader = new THREE.TextureLoader();
@@ -26,20 +25,6 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-
-const texturas = [
-    '../texturas/textura_sol.jpg',
-    '../texturas/textura_mercurio.png',
-    '../texturas/textura_venus.jpg',
-    '../texturas/textura_tierra.jpg',
-    '../texturas/textura_marte.jpg',
-    '../texturas/textura_jupiter.jpg',
-    '../texturas/textura_saturno.jpg',
-    '../texturas/textura_urano.jpg',
-    '../texturas/textura_neptuno.jpg'
-];
-
-const SCALE_SIZE = 0.00001436; // Factor de escala para los tamaños
 const SCALE_DISTANCE = 50;    // Factor de escala para las distancias
 let TIME_SCALE = 0.001;      // Valor inicial
 
@@ -52,30 +37,6 @@ if (savedSpeed) {
     console.log(`Loaded speed: ${savedSpeed}`);
 }
 
-const posIni = [
-    [0, 0, 0],            // Sol
-    [0.39 * SCALE_DISTANCE, 0, 0],         // Mercurio
-    [0.72 * SCALE_DISTANCE, 0, 0],         // Venus
-    [1.00 * SCALE_DISTANCE, 0, 0],         // Tierra
-    [1.52 * SCALE_DISTANCE, 0, 0],         // Marte
-    [5.20 * SCALE_DISTANCE, 0, 0],         // Júpiter
-    [9.58 * SCALE_DISTANCE, 0, 0],         // Saturno 9.58
-    [19.22 * SCALE_DISTANCE, 0, 0],        // Urano
-    [30.05 * SCALE_DISTANCE, 0, 0]         // Neptuno
-];
-
-const size = [
-    696340 * SCALE_SIZE,  // Sol
-    2439.7 * SCALE_SIZE,  // Mercurio
-    6051.8 * SCALE_SIZE,  // Venus
-    6371.0 * SCALE_SIZE,  // Tierra
-    3389.5 * SCALE_SIZE,  // Marte
-    69911 * SCALE_SIZE,   // Júpiter
-    58232 * SCALE_SIZE,   // Saturno
-    25362 * SCALE_SIZE,   // Urano
-    24622 * SCALE_SIZE    // Neptuno
-];
-
 const tiempoTotalOrbita = [
     25.38,  // Sol (rotación)
     87.97,  // Mercurio (traslación)
@@ -87,10 +48,7 @@ const tiempoTotalOrbita = [
     30685.49, // Urano (traslación)
     60190.03  // Neptuno (traslación)
 ];
-
 // Calcular la velocidad de rotación en función del período orbital
-const velocidadRotacion = tiempoTotalOrbita.map(dias => (2 * Math.PI) / (dias / TIME_SCALE)); // con esta velocidad de rotación no da vueltas
-
 const celestialbodies = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0, 24),
     new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 252.25, 0, 4.15, 58.6),
@@ -114,20 +72,14 @@ const color = [
   0xa3c1e0  // Neptuno (azul suave)
 ];
 
-
-
-// asteroides y cometas
-
-
 let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
-let numPuntosOrbita = 10000; 
+let numPuntosOrbita = 10000;
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
 
-
 for (let i = 0; i < 9; i++) {
-    let planeta = new Planeta(size[i], posIni[i], texturas[i], velocidadRotacion[i]);
+    let planeta = new Planeta(i);
     planetas[i] = planeta;
     sphere[i] = planetas[i].setPlaneta();
     
@@ -139,7 +91,7 @@ for (let i = 0; i < 9; i++) {
 }
 
 // Crear los anillos de Saturno y añadirlos como hijos de Saturno
-let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', size[6]);
+let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', 58232 * 0.00001436);
 
 // Crear luces
 
@@ -218,59 +170,12 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-function julianToDate(diaJuliano) {
-  // Constantes del calendario juliano
-  let j = diaJuliano + 0.5;
-  let z = Math.floor(j);
-  let f = j - z;
-
-  let A;
-  if (z < 2299161) {
-      A = z;
-  } else {
-      let alpha = Math.floor((z - 1867216.25) / 36524.25);
-      A = z + 1 + alpha - Math.floor(alpha / 4);
-  }
-
-  let B = A + 1524;
-  let C = Math.floor((B - 122.1) / 365.25);
-  let D = Math.floor(365.25 * C);
-  let E = Math.floor((B - D) / 30.6001);
-
-  // Cálculo del día, mes y año
-  let dia = B - D - Math.floor(30.6001 * E) + f;
-  let mes = (E < 14) ? E - 1 : E - 13;
-  let año = (mes > 2) ? C - 4716 : C - 4715;
-
-  // Nombres abreviados de los meses
-  const mesesAbreviados = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-  
-  // Formatear el resultado en "Día Mes (abreviado) Año"
-  return `${Math.floor(dia)} ${mesesAbreviados[mes - 1]} ${año}`;
-}
-
-
-function calcularDiaJulianoActual() {
-  const fechaActual = new Date();
-  const anio = fechaActual.getFullYear();
-  const mes = fechaActual.getMonth() + 1; // Los meses comienzan en 0
-  const dia = fechaActual.getDate();
-
-  // Algoritmo para calcular el día juliano
-  const A = Math.floor((14 - mes) / 12);
-  const Y = anio + 4800 - A;
-  const M = mes + 12 * A - 3;
-
-  const diaJuliano = dia + Math.floor((153 * M + 2) / 5) + (365 * Y) + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
-  return diaJuliano;
-}
 
 
 
 
 function crearOrbita(cuerpoCeleste, numPuntos, escala, T, color) {
     const puntos = []; 
-
     let t = 0;
     for (let i = 0; i <= numPuntos; i++) {
         const t =+ (i / numPuntos) * (T);
