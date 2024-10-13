@@ -104,25 +104,19 @@ class CelestialBody {
         const w = this.w * Math.PI / 180;
         const n = this.n * Math.PI / 180;
         const M_0 = L - w;
-
         const M = n * (t - this.t0) ;
         let E = M_0 - e_deg * Math.sin(M_0);
-
         //M = M % (2 * Math.PI);  Asegurarse de que M esté en el rango [0, 2π]
-
         let delta = 1;
         let iterations = 0;
-
         while (Math.abs(delta) > tol && iterations < max_iterations) {
             delta = E - e_deg * Math.sin(E) - M;
             E = E - delta / (1 - e_deg * Math.cos(E));
             iterations++;
         }
-
         if (iterations >= max_iterations) {
             console.warn("No convergence after maximum iterations");
         }
-
         return E;
     }
     xy_orbita_plano_orbital(E) {
@@ -165,11 +159,11 @@ class CelestialBody {
         const orbita = new THREE.Line(geometria, material);
         return orbita;
     }
-    actualizarPosicionPlanetas(tiempo) {
-            const [x, y, z] = this.xyz_orbita_plano_ecliptica(tiempo);
+    actualizarPosicionPlanetas(t) {
+            const [x, y, z] = this.xyz_orbita_plano_ecliptica(t);
             this.sphere.position.set(x * SCALE_DISTANCE, y * SCALE_DISTANCE, z * SCALE_DISTANCE);
         }
-    actualizarRotacionPlanetas(tiempo){
+    actualizarRotacionPlanetas(){
         this.sphere.rotation.y += this.calcular_n_rot()*TIME_SCALE;
     }
     }

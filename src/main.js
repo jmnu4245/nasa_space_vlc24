@@ -33,7 +33,6 @@ if (savedSpeed) {
     document.getElementById('speed-value').textContent = savedSpeed;
     console.log(`Loaded speed: ${savedSpeed}`);
 }
-
 //creamos los planetaso, objetos que nos darán los métodos para calcular lás orbitas
 const planetaso = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0, 24),
@@ -48,7 +47,6 @@ const planetaso = [
 ];
 let sphere = Array(9).fill(0);
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
-
 for (let i = 0; i < 9; i++) {
     sphere[i] = planetaso[i].getPlaneta();
     scene.add(sphere[i]);
@@ -58,11 +56,9 @@ for (let i = 0; i < 9; i++) {
     orbitas[i-1] = planetaso[i].crearOrbita(T, i);
     scene.add(orbitas[i-1]);
 }
-
 // Crear los anillos de Saturno y añadirlos como hijos de Saturno
 let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', 58232 * 0.00001436);
 anillosSaturno.setAnillos();
-
 // Crear luces
 setupLighting(scene, {
   ambientColor: 0x404040, // Color de luz ambiental
@@ -73,9 +69,6 @@ setupLighting(scene, {
       penumbra: 0.4           // Penumbra del spotlight
   }
 });
-
-// Movement of camera
-
 // Selecction of planet from localStorage
 let n_planetasel = localStorage.getItem('n_planetasel') ? parseInt(localStorage.getItem('n_planetasel')) : 0; // Carga el valor del localStorage o establece 0 si no existe
 console.log(n_planetasel);
@@ -83,14 +76,11 @@ console.log(n_planetasel);
 let selectedplanet = planetaso[n_planetasel];
 let radius = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
-
 let cameraData = {
   center: new THREE.Vector3(posSelPlanet[0], posSelPlanet[1], posSelPlanet[2]), // Centro del planeta
   theta: 0, // Ángulo inicial en el plano XY
   phi: Math.PI / 2 // Ángulo inicial en el plano Z
 };
-
-
 // Animation loop
 let tiempo = calcularDiaJulianoActual();
 animate();
@@ -99,7 +89,7 @@ function animate() {
     //planets spin
     for (let i = 0; i < planetaso.length; i++) {
         planetaso[i].actualizarPosicionPlanetas(tiempo) ;
-        planetaso[i].actualizarRotacionPlanetas(tiempo) ;
+        planetaso[i].actualizarRotacionPlanetas() ;
     }
     let fecha = julianToDate(tiempo);
     document.getElementById('dia').innerHTML = tiempo.toFixed(2);
@@ -113,8 +103,7 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-
-//------------------------------------------------------------------------
+//------------------------------------------------------------------------(no tocar)
 
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
@@ -126,18 +115,12 @@ let movementScale = 0.02 / radius;
 let previousTouchPosition = { x: 0, y: 0 };
 let initialPinchDistance = null; // Used for pinch zoom
 
-
-
 // Helper function to get the distance between two touch points
 function getTouchDistance(touch1, touch2) {
   const dx = touch1.pageX - touch2.pageX;
   const dy = touch1.pageY - touch2.pageY;
   return Math.sqrt(dx * dx + dy * dy);
 }
-
-
-
-
   window.addEventListener('mousedown', (event) => {
     console.log("dragging");
     isDragging = true;
@@ -167,9 +150,6 @@ function getTouchDistance(touch1, touch2) {
       previousMousePosition = { x: event.clientX, y: event.clientY };
     }
   });
-
-
-
 
 
 // Handle zoom with mouse wheel
