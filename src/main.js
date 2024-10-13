@@ -26,11 +26,7 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-//Creación de planetas
 
-//Create planet variables and const
-
-// Create a planet array
 const texturas = [
     '../texturas/textura_sol.jpg',
     '../texturas/textura_mercurio.png',
@@ -93,18 +89,18 @@ const tiempoTotalOrbita = [
 ];
 
 // Calcular la velocidad de rotación en función del período orbital
-const velocidadRotacion = tiempoTotalOrbita.map(dias => (2 * Math.PI) / (dias / TIME_SCALE));
+const velocidadRotacion = tiempoTotalOrbita.map(dias => (2 * Math.PI) / (dias / TIME_SCALE)); // con esta velocidad de rotación no da vueltas
 
 const celestialbodies = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0),
-    new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 252.25, 0, 4.15),
-    new CelestialBody('2', 'Venus', 0.0068, 0.723, 0.718, 3.4, 76.7, 131.6, 181.98, 0, 1.62),
-    new CelestialBody('3', 'Tierra', 0.0167, 1.000, 0.983, 0.0, 0.0, 102.9, 100.46, 0, 0.99),
-    new CelestialBody('4', 'Marte', 0.0934, 1.524, 1.381, 1.9, 49.6, -23.96, -4.55, 0, 0.53),
-    new CelestialBody('5', 'Júpiter', 0.0484, 5.203, 4.951, 1.3, 100.5, 14.73, 34.40, 0, 0.08),
-    new CelestialBody('6', 'Saturno', 0.0542, 9.537, 9.020, 2.5, 113.7, 92.6, 49.95, 0, 0.03),
-    new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 170.95, 313.24, 0, 0.01),
-    new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 44.96, -55.12, 0, 0.006)
+    new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 252.25, 0, 4.15, 58.6),
+    new CelestialBody('2', 'Venus', 0.0068, 0.723, 0.718, 3.4, 76.7, 131.6, 181.98, 0, 1.62, -243), //rotación retrógrada
+    new CelestialBody('3', 'Tierra', 0.0167, 1.000, 0.983, 0.0, 0.0, 102.9, 100.46, 0, 0.99, 1),
+    new CelestialBody('4', 'Marte', 0.0934, 1.524, 1.381, 1.9, 49.6, -23.96, -4.55, 0, 0.53, 1.03 ),
+    new CelestialBody('5', 'Júpiter', 0.0484, 5.203, 4.951, 1.3, 100.5, 14.73, 34.40, 0, 0.08, 0.41),
+    new CelestialBody('6', 'Saturno', 0.0542, 9.537, 9.020, 2.5, 113.7, 92.6, 49.95, 0, 0.03, 0.45),
+    new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 170.95, 313.24, 0, 0.01, -0.72), //rotación retrógrada
+    new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 44.96, -55.12, 0, 0.006, 0.67)
 ];
 const color = [
     0xffff00, // Sol (no se usa)
@@ -118,10 +114,14 @@ const color = [
     0x0000ff  // Neptuno
 ];
 
+// asteroides y cometas
+
+
 let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
-let numPuntosOrbita = 10000; // Aumentar el número de puntos en las órbitas
+let numPuntosOrbita = 10000; 
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
+
 
 
 for (let i = 0; i < 9; i++) {
@@ -192,6 +192,9 @@ let phi = Math.PI/2; // Z-plane initial angle
 
 // Animation loop
 let tiempo = calcularDiaJulianoActual();
+animate();
+
+
 function animate() {
     requestAnimationFrame(animate);
     //planets spin
@@ -238,8 +241,7 @@ function julianToDate(diaJuliano) {
   let año = (mes > 2) ? C - 4716 : C - 4715;
 
   // Nombres abreviados de los meses
-  const mesesAbreviados = ["ene", "feb", "mar", "abr", "may", "jun", 
-                            "jul", "ago", "sep", "oct", "nov", "dic"];
+  const mesesAbreviados = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   
   // Formatear el resultado en "Día Mes (abreviado) Año"
   return `${Math.floor(dia)} ${mesesAbreviados[mes - 1]} ${año}`;
@@ -261,7 +263,7 @@ function calcularDiaJulianoActual() {
   return diaJuliano;
 }
 
-animate();
+
 
 
 function crearOrbita(cuerpoCeleste, numPuntos, escala, T, color) {
@@ -288,6 +290,12 @@ function actualizarPosicionPlanetas(cuerposCelestes, esferas, tiempo) {
 
     }
 }
+
+
+
+
+//------------------------------------------------------------------------
+
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
 let minZoom = 4 * radius;
@@ -306,6 +314,8 @@ function getTouchDistance(touch1, touch2) {
   const dy = touch1.pageY - touch2.pageY;
   return Math.sqrt(dx * dx + dy * dy);
 }
+
+
 
 // Handle mouse events for desktop
 window.addEventListener('mousedown', (event) => {

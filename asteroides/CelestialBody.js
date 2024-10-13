@@ -1,5 +1,5 @@
 class CelestialBody {
-    constructor(id, name, e, a, p, I, Omega, w, L, t0, n) {
+    constructor(id, name, e, a, p, I, Omega, w, L, t0, n, rot_per) {
         this.id = id;
         this.name = name;
         this.e = e; // none
@@ -11,6 +11,7 @@ class CelestialBody {
         this.L = L; // deg
         this.t0 = t0; // julian Days
         this.n = n; // deg per day
+        this.rot_per = rot_per; //periodo de rotacion en dias
     }
 
     //cálculo del periodo orbital
