@@ -7,28 +7,23 @@ import CelestialBody from './CelestialBody.js';
 
 //Inicializar escena
 const scene = new THREE.Scene();
-
-// Camera
+  // Camera
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200000); // Aumentar la distancia de recorte
-
-// Fondo
+  // Fondo
 const loader = new THREE.TextureLoader();
-loader.load('./../entorno/fondo_8k.jpg', function(texture) {
+loader.load('../texturas/fondo_8k.jpg', function(texture) {
     const geometry = new THREE.SphereGeometry(100000, 100, 100); // Aumentar el tamaño del skybox
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.BackSide }); // Invierte las normales
     const skybox = new THREE.Mesh(geometry, material);
     scene.add(skybox);
 });
-
-// Renderer
+  // Renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
-
 const SCALE_DISTANCE = 50;    // Factor de escala para las distancias
 let TIME_SCALE = 0.001;      // Valor inicial
-
-// Recuperar la velocidad de la simulación desde localStorage
+  // Recuperar la velocidad de la simulación desde localStorage
 const savedSpeed = localStorage.getItem('simulationSpeed');
 if (savedSpeed) {
     TIME_SCALE = parseFloat(savedSpeed) / (60*60); // Convertir días por minuto a días por segundo teniendo en cuenta la frecuencia del animate
@@ -48,8 +43,8 @@ const tiempoTotalOrbita = [
     30685.49, // Urano (traslación)
     60190.03  // Neptuno (traslación)
 ];
-// Calcular la velocidad de rotación en función del período orbital
-const celestialbodies = [
+//creamos los planetaso, objetos que nos darán los métodos para calcular lás orbitas
+const planetaso = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0, 24),
     new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 252.25, 0, 4.15, 58.6),
     new CelestialBody('2', 'Venus', 0.0068, 0.723, 0.718, 3.4, 76.7, 131.6, 181.98, 0, 1.62, -243), //rotación retrógrada
@@ -60,31 +55,15 @@ const celestialbodies = [
     new CelestialBody('7', 'Urano', 0.0472, 19.191, 18.286, 0.8, 74.0, 170.95, 313.24, 0, 0.01, -0.72), //rotación retrógrada
     new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 44.96, -55.12, 0, 0.006, 0.67)
 ];
-const color = [
-  0xffe59e, // Sol (amarillo suave)
-  0xc2c2c2, // Mercurio (gris suave)
-  0xffd5a0, // Venus (naranja muy suave)
-  0xa3c1e0, // Tierra (azul suave)
-  0xffb3b3, // Marte (rojo suave)
-  0xffd5a0, // Júpiter (naranja muy suave)
-  0xffe59e, // Saturno (amarillo suave)
-  0xb3e0e0, // Urano (cyan suave)
-  0xa3c1e0  // Neptuno (azul suave)
-];
-
-let planetas = Array(9).fill(0);
 let sphere = Array(9).fill(0);
-let numPuntosOrbita = 10000;
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
 
 for (let i = 0; i < 9; i++) {
-    let planeta = new Planeta(i);
-    planetas[i] = planeta;
-    sphere[i] = planetas[i].setPlaneta();
-    
-    let T = celestialbodies[i].calcular_T();
-    orbitas[i-1] = crearOrbita(celestialbodies[i], numPuntosOrbita, SCALE_DISTANCE, T, color[i]);
+    sphere[i] = planetaso[i].setPlaneta();
+    //Para cada planeta, calculamos su Periodo
+    let T = planetaso[i].calcular_T();
+    orbitas[i-1] = planetaso[i].crearOrbita(T, i);
     scene.add(orbitas[i-1]);
     
     scene.add(sphere[i]);
@@ -136,7 +115,7 @@ createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
 let n_planetasel = localStorage.getItem('n_planetasel') ? parseInt(localStorage.getItem('n_planetasel')) : 0; // Carga el valor del localStorage o establece 0 si no existe
 console.log(n_planetasel);
 // Camera parameters
-let selectedplanet = planetas[n_planetasel];
+let selectedplanet = planetaso[n_planetasel];
 let radius = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
 let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]); // Center of the followed planet
@@ -152,9 +131,9 @@ animate();
 function animate() {
     requestAnimationFrame(animate);
     //planets spin
-    for (let i = 0; i < planetas.length; i++) {
-        actualizarPosicionPlanetas(celestialbodies, sphere, tiempo);
-        sphere[i].rotation.y += celestialbodies[i].calcular_n_rot()*TIME_SCALE;
+    for (let i = 0; i < planetaso.length; i++) {
+        actualizarPosicionPlanetas(planetaso, sphere, tiempo);
+        sphere[i].rotation.y += planetaso[i].calcular_n_rot()*TIME_SCALE;
        
     }
     let fecha = julianToDate(tiempo);
@@ -170,25 +149,6 @@ function animate() {
     renderer.render(scene, camera);
 }
 
-
-
-
-
-function crearOrbita(cuerpoCeleste, numPuntos, escala, T, color) {
-    const puntos = []; 
-    let t = 0;
-    for (let i = 0; i <= numPuntos; i++) {
-        const t =+ (i / numPuntos) * (T);
-        const [x, y, z] = cuerpoCeleste.xyz_orbita_plano_ecliptica(t);
-        puntos.push(new THREE.Vector3(x * escala, y * escala, z * escala));
-    }
-
-    const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
-    const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 }); // Asegurarse de que el material sea visible
-    const orbita = new THREE.Line(geometria, material);
-
-    return orbita;
-}
 
 function actualizarPosicionPlanetas(cuerposCelestes, esferas, tiempo) {
     for (let i = 1; i < cuerposCelestes.length; i++) { // Empezar desde 1 para omitir el Sol

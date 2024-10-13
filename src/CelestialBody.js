@@ -1,3 +1,45 @@
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
+
+const numPuntos = 10000;
+const SCALE_DISTANCE = 50;
+const color = [
+  0xffe59e, // Sol (amarillo suave)
+  0xc2c2c2, // Mercurio (gris suave)
+  0xffd5a0, // Venus (naranja muy suave)
+  0xa3c1e0, // Tierra (azul suave)
+  0xffb3b3, // Marte (rojo suave)
+  0xffd5a0, // Júpiter (naranja muy suave)
+  0xffe59e, // Saturno (amarillo suave)
+  0xb3e0e0, // Urano (cyan suave)
+  0xa3c1e0  // Neptuno (azul suave)
+];
+const SCALE = 62;
+const SCALE_SIZE = 0.00001436; // Factor de escala para los tamaños
+
+const size = [
+    696340 * SCALE_SIZE,  // Sol
+    2439.7 * SCALE_SIZE,  // Mercurio
+    6051.8 * SCALE_SIZE,  // Venus
+    6371.0 * SCALE_SIZE,  // Tierra
+    3389.5 * SCALE_SIZE,  // Marte
+    69911 * SCALE_SIZE,   // Júpiter
+    58232 * SCALE_SIZE,   // Saturno
+    25362 * SCALE_SIZE,   // Urano
+    24622 * SCALE_SIZE    // Neptuno
+];
+const textura = [
+    '../texturas/textura_sol.jpg',
+    '../texturas/textura_mercurio.png',
+    '../texturas/textura_venus.jpg',
+    '../texturas/textura_tierra.jpg',
+    '../texturas/textura_marte.jpg',
+    '../texturas/textura_jupiter.jpg',
+    '../texturas/textura_saturno.jpg',
+    '../texturas/textura_urano.jpg',
+    '../texturas/textura_neptuno.jpg'
+];
+
+
 class CelestialBody {
     constructor(id, name, e, a, p, I, Omega, w, L, t0, n, rot_per) {
         this.id = id;
@@ -12,8 +54,25 @@ class CelestialBody {
         this.t0 = t0; // julian Days
         this.n = n; // deg per day
         this.rot_per = rot_per; //periodo de rotacion en dias
+        this.tamaño = size[id];
+        this.posicion = [0,0,0];
+        this.textura = textura[id];
     }
-
+    cambiarPosicion(nuevaPosicion)
+    {
+        if (nuevaPosicion.length == 3){
+            this.posicion = nuevaPosicion/SCALE;
+        }else{
+            console.log("Error: la nueva posición no tiene tres componentes");
+        }
+    }
+    setPlaneta(){
+        const geometry = new THREE.SphereGeometry(this.tamaño, 64, 64);
+        const material = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(this.textura) });
+        const sphere = new THREE.Mesh(geometry, material);
+        sphere.position.set(...this.posicion);
+        return sphere;
+    }
     //cálculo del periodo orbital
     calcular_T(){
         const T = 360 / this.n;
@@ -24,7 +83,6 @@ class CelestialBody {
         const n_rot = 2* Math.PI / this.rot_per;
         return n_rot;
     }
-
     //cálculo de la anomalía excéntrica
     calcular_E(t) {
         const tol = 1e-6 * Math.PI / 180;
@@ -55,13 +113,11 @@ class CelestialBody {
 
         return E;
     }
-
     xy_orbita_plano_orbital(E) {
         const x = this.a * (Math.cos(E) - this.e);
         const y = this.a * Math.sqrt(1 - this.e ** 2) * Math.sin(E);
         return [x, y];
     }
-
     xyz_orbita_plano_ecliptica(t) {
         const E = this.calcular_E(t);
         const [x0, y0] = this.xy_orbita_plano_orbital(E);
@@ -85,7 +141,21 @@ class CelestialBody {
         return [x, z, y]; //se ha usado distinto SR en los calculos y en la simulación
     }
 
+    crearOrbita(T, i) {
+        const puntos = []; 
+        let t = 0;
+        for (let i = 0; i <= numPuntos; i++) {
+            const t =+ (i / numPuntos) * (T);
+            const [x, y, z] = this.xyz_orbita_plano_ecliptica(t);
+            puntos.push(new THREE.Vector3(x *SCALE_DISTANCE , y * SCALE_DISTANCE, z * SCALE_DISTANCE));
+        }
     
+        const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
+        const material = new THREE.LineBasicMaterial({ color: color[i], linewidth: 2 }); // Asegurarse de que el material sea visible
+        const orbita = new THREE.Line(geometria, material);
+    
+        return orbita;
+    }
 }
 
 export default CelestialBody;
