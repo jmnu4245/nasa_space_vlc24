@@ -19,6 +19,11 @@ class CelestialBody {
         const T = 360 / this.n;
         return T;
     }
+    //cálculo velocidad angular de rotación
+    calcular_n_rot(){
+        const n_rot = 2* Math.PI / this.rot_per;
+        return n_rot;
+    }
 
     //cálculo de la anomalía excéntrica
     calcular_E(t) {

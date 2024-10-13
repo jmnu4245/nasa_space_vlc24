@@ -46,7 +46,7 @@ let TIME_SCALE = 0.001;      // Valor inicial
 // Recuperar la velocidad de la simulación desde localStorage
 const savedSpeed = localStorage.getItem('simulationSpeed');
 if (savedSpeed) {
-    TIME_SCALE = parseFloat(savedSpeed) / (60 * 60); // Convertir días por minuto a días por segundo
+    TIME_SCALE = parseFloat(savedSpeed) / (60*60); // Convertir días por minuto a días por segundo teniendo en cuenta la frecuencia del animate
     document.getElementById('speed-range').value = savedSpeed;
     document.getElementById('speed-value').textContent = savedSpeed;
     console.log(`Loaded speed: ${savedSpeed}`);
@@ -92,7 +92,7 @@ const tiempoTotalOrbita = [
 const velocidadRotacion = tiempoTotalOrbita.map(dias => (2 * Math.PI) / (dias / TIME_SCALE)); // con esta velocidad de rotación no da vueltas
 
 const celestialbodies = [
-    new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0),
+    new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0, 24),
     new CelestialBody('1', 'Mercurio', 0.2056, 0.387, 0.3075, 7.0, 48.3, 77, 252.25, 0, 4.15, 58.6),
     new CelestialBody('2', 'Venus', 0.0068, 0.723, 0.718, 3.4, 76.7, 131.6, 181.98, 0, 1.62, -243), //rotación retrógrada
     new CelestialBody('3', 'Tierra', 0.0167, 1.000, 0.983, 0.0, 0.0, 102.9, 100.46, 0, 0.99, 1),
@@ -103,16 +103,18 @@ const celestialbodies = [
     new CelestialBody('8', 'Neptuno', 0.0086, 30.069, 29.819, 1.8, 131.8, 44.96, -55.12, 0, 0.006, 0.67)
 ];
 const color = [
-    0xffff00, // Sol (no se usa)
-    0xaaaaaa, // Mercurio
-    0xffa500, // Venus
-    0x0000ff, // Tierra
-    0xff0000, // Marte
-    0xffa500, // Júpiter
-    0xffff00, // Saturno
-    0x00ffff, // Urano
-    0x0000ff  // Neptuno
+  0xffe59e, // Sol (amarillo suave)
+  0xc2c2c2, // Mercurio (gris suave)
+  0xffd5a0, // Venus (naranja muy suave)
+  0xa3c1e0, // Tierra (azul suave)
+  0xffb3b3, // Marte (rojo suave)
+  0xffd5a0, // Júpiter (naranja muy suave)
+  0xffe59e, // Saturno (amarillo suave)
+  0xb3e0e0, // Urano (cyan suave)
+  0xa3c1e0  // Neptuno (azul suave)
 ];
+
+
 
 // asteroides y cometas
 
@@ -200,7 +202,7 @@ function animate() {
     //planets spin
     for (let i = 0; i < planetas.length; i++) {
         actualizarPosicionPlanetas(celestialbodies, sphere, tiempo);
-        sphere[i].rotation.y += planetas[i].velocidadRotacion;
+        sphere[i].rotation.y += celestialbodies[i].calcular_n_rot()*TIME_SCALE;
        
     }
     let fecha = julianToDate(tiempo);
