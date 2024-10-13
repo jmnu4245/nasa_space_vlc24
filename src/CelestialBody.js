@@ -84,6 +84,8 @@ class CelestialBody {
 
         return [x, z, y]; //se ha usado distinto SR en los calculos y en la simulación
     }
+
+    
 }
 
 export default CelestialBody;
