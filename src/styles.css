@@ -9,7 +9,13 @@ body {
 .fecha{
   padding:10px;
 }
-
+#planetario {
+  width: 200px;
+  height: 200px;
+  background-color: lightblue;
+  border: 1px solid blue;
+  position: relative; /* Asegúrate de que el elemento sea interactuable */
+}
 /* Estilo del contenido principal */
 #content {
   padding: 20px;

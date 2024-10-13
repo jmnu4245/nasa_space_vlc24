@@ -1,6 +1,7 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
 const numPuntos = 10000;
+let TIME_SCALE = 0.001;
 const SCALE_DISTANCE = 50;
 const color = [
   0xffe59e, // Sol (amarillo suave)
@@ -15,6 +16,18 @@ const color = [
 ];
 const SCALE = 62;
 const SCALE_SIZE = 0.00001436; // Factor de escala para los tamaños
+
+const tiempoTotalOrbita = [
+    25.38,  // Sol (rotación)
+    87.97,  // Mercurio (traslación)
+    224.70, // Venus (traslación)
+    365.25, // Tierra (traslación)
+    686.98, // Marte (traslación)
+    4332.59, // Júpiter (traslación)
+    10759.22, // Saturno (traslación)
+    30685.49, // Urano (traslación)
+    60190.03  // Neptuno (traslación)
+];
 
 const size = [
     696340 * SCALE_SIZE,  // Sol
@@ -39,7 +52,6 @@ const textura = [
     '../texturas/textura_neptuno.jpg'
 ];
 
-
 class CelestialBody {
     constructor(id, name, e, a, p, I, Omega, w, L, t0, n, rot_per) {
         this.id = id;
@@ -57,6 +69,10 @@ class CelestialBody {
         this.tamaño = size[id];
         this.posicion = [0,0,0];
         this.textura = textura[id];
+        this.geometry = new THREE.SphereGeometry(this.tamaño, 64, 64);
+        this.material = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(this.textura) });
+        this.sphere = new THREE.Mesh(this.geometry, this.material);
+        this.sphere.position.set(...[0,0,0]);
     }
     cambiarPosicion(nuevaPosicion)
     {
@@ -66,12 +82,8 @@ class CelestialBody {
             console.log("Error: la nueva posición no tiene tres componentes");
         }
     }
-    setPlaneta(){
-        const geometry = new THREE.SphereGeometry(this.tamaño, 64, 64);
-        const material = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(this.textura) });
-        const sphere = new THREE.Mesh(geometry, material);
-        sphere.position.set(...this.posicion);
-        return sphere;
+    getPlaneta(){
+        return this.sphere;
     }
     //cálculo del periodo orbital
     calcular_T(){
@@ -140,7 +152,6 @@ class CelestialBody {
 
         return [x, z, y]; //se ha usado distinto SR en los calculos y en la simulación
     }
-
     crearOrbita(T, i) {
         const puntos = []; 
         let t = 0;
@@ -149,13 +160,17 @@ class CelestialBody {
             const [x, y, z] = this.xyz_orbita_plano_ecliptica(t);
             puntos.push(new THREE.Vector3(x *SCALE_DISTANCE , y * SCALE_DISTANCE, z * SCALE_DISTANCE));
         }
-    
         const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
         const material = new THREE.LineBasicMaterial({ color: color[i], linewidth: 2 }); // Asegurarse de que el material sea visible
         const orbita = new THREE.Line(geometria, material);
-    
         return orbita;
     }
-}
-
+    actualizarPosicionPlanetas(tiempo) {
+            const [x, y, z] = this.xyz_orbita_plano_ecliptica(tiempo);
+            this.sphere.position.set(x * SCALE_DISTANCE, y * SCALE_DISTANCE, z * SCALE_DISTANCE);
+        }
+    actualizarRotacionPlanetas(tiempo){
+        this.sphere.rotation.y += this.calcular_n_rot()*TIME_SCALE;
+    }
+    }
 export default CelestialBody;

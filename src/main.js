@@ -1,9 +1,9 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 import { calcularDiaJulianoActual , julianToDate} from './julianthings.js';
 import {updateCameraPosition} from './cameracontrol.js';
-import Planeta from './Planeta.js';
 import Anillos from './Anillos.js';
 import CelestialBody from './CelestialBody.js';
+import { setupLighting } from './lights.js';
 
 //Inicializar escena
 const scene = new THREE.Scene();
@@ -17,12 +17,14 @@ loader.load('../texturas/fondo_8k.jpg', function(texture) {
     const skybox = new THREE.Mesh(geometry, material);
     scene.add(skybox);
 });
+
   // Renderer
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 const SCALE_DISTANCE = 50;    // Factor de escala para las distancias
 let TIME_SCALE = 0.001;      // Valor inicial
+
   // Recuperar la velocidad de la simulación desde localStorage
 const savedSpeed = localStorage.getItem('simulationSpeed');
 if (savedSpeed) {
@@ -32,17 +34,6 @@ if (savedSpeed) {
     console.log(`Loaded speed: ${savedSpeed}`);
 }
 
-const tiempoTotalOrbita = [
-    25.38,  // Sol (rotación)
-    87.97,  // Mercurio (traslación)
-    224.70, // Venus (traslación)
-    365.25, // Tierra (traslación)
-    686.98, // Marte (traslación)
-    4332.59, // Júpiter (traslación)
-    10759.22, // Saturno (traslación)
-    30685.49, // Urano (traslación)
-    60190.03  // Neptuno (traslación)
-];
 //creamos los planetaso, objetos que nos darán los métodos para calcular lás orbitas
 const planetaso = [
     new CelestialBody('0', 'Sol', 0, 0, 0, 0, 0, 0, 0, 0, 0, 24),
@@ -58,56 +49,30 @@ const planetaso = [
 let sphere = Array(9).fill(0);
 let orbitas = Array(8).fill(0); // Solo 8 órbitas, una por planeta (excluyendo el Sol)
 
-
 for (let i = 0; i < 9; i++) {
-    sphere[i] = planetaso[i].setPlaneta();
+    sphere[i] = planetaso[i].getPlaneta();
+    scene.add(sphere[i]);
     //Para cada planeta, calculamos su Periodo
     let T = planetaso[i].calcular_T();
+    //Para cada órbita, calculamos su órbita
     orbitas[i-1] = planetaso[i].crearOrbita(T, i);
     scene.add(orbitas[i-1]);
-    
-    scene.add(sphere[i]);
 }
 
 // Crear los anillos de Saturno y añadirlos como hijos de Saturno
 let anillosSaturno = new Anillos(sphere[6], '../texturas/anillo_saturno.jpg', 58232 * 0.00001436);
+anillosSaturno.setAnillos();
 
 // Crear luces
-
-// Luz ambiental suave
-
-const ambientLight = new THREE.AmbientLight(0x404040); 
-scene.add(ambientLight);
-
-//iluminaciónsol
-const radiussol = 20; // Radio del sol, ajustable dinámicamente
-const intensity = 1;
-const distance = 1000;
-const penumbra = 0.4;
-
-// Función para crear y agregar un Spotlight a la escena
-function createSpotLight(position) {
-    const spotLight = new THREE.SpotLight(0xffffff, intensity);
-    spotLight.position.set(position.x, position.y, position.z); // Posición
-    spotLight.target.position.set(0, 0, 0); // Apuntar al centro del sol
-    spotLight.penumbra = penumbra; // Difuminado en los bordes
-    spotLight.distance = distance; // Distancia a la que afecta la luz
-    scene.add(spotLight);
-    scene.add(spotLight.target);
-}
-
-createSpotLight({ x: 0, y: radiussol * 2, z: 0 });
-// Desde abajo
-createSpotLight({ x: 0, y: -radiussol * 2, z: 0 });
-// Desde la izquierda
-createSpotLight({ x: -radiussol * 2, y: 0, z: 0 });
-// Desde la derecha
-createSpotLight({ x: radiussol * 2, y: 0, z: 0 });
-// Desde el frente
-createSpotLight({ x: 0, y: 0, z: radiussol * 2 });
-// Desde atrás
-createSpotLight({ x: 0, y: 0, z: -radiussol * 2 });
-
+setupLighting(scene, {
+  ambientColor: 0x404040, // Color de luz ambiental
+  radiusSun: 696340 * 0.00001436*1.5,          // Radio del sol
+  spotLightOptions: {
+      intensity: 1,           // Intensidad del spotlight
+      distance: 1000,         // Distancia del spotlight
+      penumbra: 0.4           // Penumbra del spotlight
+  }
+});
 
 // Movement of camera
 
@@ -118,47 +83,35 @@ console.log(n_planetasel);
 let selectedplanet = planetaso[n_planetasel];
 let radius = selectedplanet.tamaño;
 let posSelPlanet = selectedplanet.posicion;
-let center =new THREE.Vector3(posSelPlanet[0],posSelPlanet[1],posSelPlanet[2]); // Center of the followed planet
-let theta = 0; //XY-plane initial angle
-let phi = Math.PI/2; // Z-plane initial angle
+
+let cameraData = {
+  center: new THREE.Vector3(posSelPlanet[0], posSelPlanet[1], posSelPlanet[2]), // Centro del planeta
+  theta: 0, // Ángulo inicial en el plano XY
+  phi: Math.PI / 2 // Ángulo inicial en el plano Z
+};
 
 
 // Animation loop
 let tiempo = calcularDiaJulianoActual();
 animate();
-
-
 function animate() {
     requestAnimationFrame(animate);
     //planets spin
     for (let i = 0; i < planetaso.length; i++) {
-        actualizarPosicionPlanetas(planetaso, sphere, tiempo);
-        sphere[i].rotation.y += planetaso[i].calcular_n_rot()*TIME_SCALE;
-       
+        planetaso[i].actualizarPosicionPlanetas(tiempo) ;
+        planetaso[i].actualizarRotacionPlanetas(tiempo) ;
     }
     let fecha = julianToDate(tiempo);
     document.getElementById('dia').innerHTML = tiempo.toFixed(2);
     document.getElementById('fecha').innerHTML = fecha;
     tiempo += TIME_SCALE;
     
-
     posSelPlanet = selectedplanet.posicion;
-    center =sphere[n_planetasel].position;
-    
-    updateCameraPosition(camera,center,radius,phi,theta);
+    cameraData.center =sphere[n_planetasel].position;
+     
+    updateCameraPosition(camera,cameraData,radius);
     renderer.render(scene, camera);
 }
-
-
-function actualizarPosicionPlanetas(cuerposCelestes, esferas, tiempo) {
-    for (let i = 1; i < cuerposCelestes.length; i++) { // Empezar desde 1 para omitir el Sol
-        const [x, y, z] = cuerposCelestes[i].xyz_orbita_plano_ecliptica(tiempo);
-        esferas[i].position.set(x * SCALE_DISTANCE, y * SCALE_DISTANCE, z * SCALE_DISTANCE);
-
-    }
-}
-
-
 
 
 //------------------------------------------------------------------------
@@ -184,42 +137,47 @@ function getTouchDistance(touch1, touch2) {
 
 
 
-// Handle mouse events for desktop
-window.addEventListener('mousedown', (event) => {
-  isDragging = true;
-  previousMousePosition = { x: event.clientX, y: event.clientY };
-});
 
-window.addEventListener('mouseup', () => {
-  isDragging = false;
-});
-
-window.addEventListener('mousemove', (event) => {
-  if (isDragging) {
-    const deltaMove = {
-      x: event.clientX - previousMousePosition.x,
-      y: event.clientY - previousMousePosition.y,
-    };
-
-    theta += deltaMove.x * movementScale; // Y-axis rotation
-    phi -= deltaMove.y * movementScale; // X-axis rotation
-
-    // Clamp phi angle to avoid flipping the camera
-    const maxPhi = Math.PI - 0.1;
-    const minPhi = 0.1;
-    phi = Math.max(minPhi, Math.min(maxPhi, phi));
-
-    updateCameraPosition(camera, center, radius, phi, theta);
+  window.addEventListener('mousedown', (event) => {
+    console.log("dragging");
+    isDragging = true;
     previousMousePosition = { x: event.clientX, y: event.clientY };
-  }
-});
+  });
+  
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+  
+  window.addEventListener('mousemove', (event) => {
+    if (isDragging) {
+      const deltaMove = {
+        x: event.clientX - previousMousePosition.x,
+        y: event.clientY - previousMousePosition.y,
+      };
+  
+      cameraData.theta += deltaMove.x * movementScale; // Y-axis rotation
+      cameraData.phi -= deltaMove.y * movementScale; // X-axis rotation
+  
+      // Clamp phi angle to avoid flipping the camera
+      const maxPhi = Math.PI - 0.1;
+      const minPhi = 0.1;
+      cameraData.phi = Math.max(minPhi, Math.min(maxPhi, cameraData.phi));
+  
+      updateCameraPosition(camera, cameraData, radius);
+      previousMousePosition = { x: event.clientX, y: event.clientY };
+    }
+  });
+
+
+
+
 
 // Handle zoom with mouse wheel
 window.addEventListener('wheel', (event) => {
   event.preventDefault();
   radius += event.deltaY * zoomSpeed;
   radius = Math.max(minZoom, Math.min(maxZoom, radius));
-  updateCameraPosition(camera, center, radius, phi, theta);
+  updateCameraPosition(camera, camearData, radius);
 });
 
 // Handle touch events for mobile
@@ -252,15 +210,15 @@ window.addEventListener('touchmove', (event) => {
       y: currentTouch.y - previousTouchPosition.y,
     };
 
-    theta += deltaMove.x * movementScale; // Y-axis rotation
-    phi -= deltaMove.y * movementScale; // X-axis rotation
+    cameraData.theta += deltaMove.x * movementScale; // Y-axis rotation
+    cameraData.phi -= deltaMove.y * movementScale; // X-axis rotation
 
     // Clamp phi angle to avoid flipping the camera
     const maxPhi = Math.PI - 0.1;
     const minPhi = 0.1;
-    phi = Math.max(minPhi, Math.min(maxPhi, phi));
+    cameraData.phi = Math.max(minPhi, Math.min(maxPhi, cameraData.phi));
 
-    updateCameraPosition(camera, center, radius, phi, theta);
+    updateCameraPosition(camera, cameraData, radius);
     previousTouchPosition = { x: currentTouch.x, y: currentTouch.y };
   } else if (event.touches.length === 2) { // Pinch-to-zoom
     const newPinchDistance = getTouchDistance(event.touches[0], event.touches[1]);
@@ -268,7 +226,7 @@ window.addEventListener('touchmove', (event) => {
       const pinchDelta = newPinchDistance - initialPinchDistance;
       radius -= pinchDelta * zoomSpeed;
       radius = Math.max(minZoom, Math.min(maxZoom, radius));
-      updateCameraPosition(camera, center, radius, phi, theta);
+      updateCameraPosition(camera, cameraData, radius);
     }
     initialPinchDistance = newPinchDistance; // Update for next move
   }
@@ -279,28 +237,5 @@ window.addEventListener('touchend', (event) => {
   if (event.touches.length === 0) {
     isDragging = false;
     initialPinchDistance = null;
-  }
-});
-const mouse = new THREE.Vector2();
-
-const raycaster = new THREE.Raycaster();
-window.addEventListener('click', (event) => {
-  // Calcular las coordenadas del mouse en espacio NDC (-1 a 1)
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-  // Proyectar un rayo desde la cámara hacia la escena, basado en la posición del mouse
-  raycaster.setFromCamera(mouse, camera);
-
-  // Calcular los objetos intersectados por el rayo
-  const intersects = raycaster.intersectObjects(scene.children);
-
-  // Si hay intersecciones
-  if (intersects.length > 0) {
-      // Cambiar el color del primer objeto intersectado (en este caso, el planeta)
-      if(intersects[0].object instanceof Planeta){
-          sidebar.classList.add('open');
-      }
-      console.log(intersects[0].object);
   }
 });
