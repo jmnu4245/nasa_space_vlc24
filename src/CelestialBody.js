@@ -53,7 +53,7 @@ const textura = [
 ];
 
 class CelestialBody {
-    constructor(id, name, e, a, p, I, Omega, w, L, t0, n, rot_per) {
+    constructor(id,index, name, e, a, p, I, Omega, w, L, t0, n, rot_per) {
         this.id = id;
         this.name = name;
         this.e = e; // none
@@ -66,9 +66,9 @@ class CelestialBody {
         this.t0 = t0; // julian Days
         this.n = n; // deg per day
         this.rot_per = rot_per; //periodo de rotacion en dias
-        this.tamaño = size[id];
+        this.tamaño = size[index];
         this.posicion = [0,0,0];
-        this.textura = textura[id];
+        this.textura = textura[index];
         this.geometry = new THREE.SphereGeometry(this.tamaño, 64, 64);
         this.material = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(this.textura) });
         this.sphere = new THREE.Mesh(this.geometry, this.material);
