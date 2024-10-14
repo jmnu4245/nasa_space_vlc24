@@ -1,59 +1,14 @@
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
 
-const numPuntos = 10000;
+const numPuntos = 100000;
 let TIME_SCALE = 0.001;
 const SCALE_DISTANCE = 50;
-const color = [
-  0xffe59e, // Sol (amarillo suave)
-  0xc2c2c2, // Mercurio (gris suave)
-  0xffd5a0, // Venus (naranja muy suave)
-  0xa3c1e0, // Tierra (azul suave)
-  0xffb3b3, // Marte (rojo suave)
-  0xffd5a0, // Júpiter (naranja muy suave)
-  0xffe59e, // Saturno (amarillo suave)
-  0xb3e0e0, // Urano (cyan suave)
-  0xa3c1e0  // Neptuno (azul suave)
-];
 const SCALE = 62;
-const SCALE_SIZE = 0.00001436; // Factor de escala para los tamaños
 
-const tiempoTotalOrbita = [
-    25.38,  // Sol (rotación)
-    87.97,  // Mercurio (traslación)
-    224.70, // Venus (traslación)
-    365.25, // Tierra (traslación)
-    686.98, // Marte (traslación)
-    4332.59, // Júpiter (traslación)
-    10759.22, // Saturno (traslación)
-    30685.49, // Urano (traslación)
-    60190.03  // Neptuno (traslación)
-];
 
-const size = [
-    696340 * SCALE_SIZE,  // Sol
-    2439.7 * SCALE_SIZE,  // Mercurio
-    6051.8 * SCALE_SIZE,  // Venus
-    6371.0 * SCALE_SIZE,  // Tierra
-    3389.5 * SCALE_SIZE,  // Marte
-    69911 * SCALE_SIZE,   // Júpiter
-    58232 * SCALE_SIZE,   // Saturno
-    25362 * SCALE_SIZE,   // Urano
-    24622 * SCALE_SIZE    // Neptuno
-];
-const textura = [
-    '../texturas/textura_sol.jpg',
-    '../texturas/textura_mercurio.png',
-    '../texturas/textura_venus.jpg',
-    '../texturas/textura_tierra.jpg',
-    '../texturas/textura_marte.jpg',
-    '../texturas/textura_jupiter.jpg',
-    '../texturas/textura_saturno.jpg',
-    '../texturas/textura_urano.jpg',
-    '../texturas/textura_neptuno.jpg'
-];
 
 class CelestialBody {
-    constructor(id, name, e, a, p, I, Omega, w, L, t0, n, rot_per) {
+    constructor(id, name, e, a, p, I, Omega, w, L, t0, n, rot_per, diameter, textura,color_orbita) {
         this.id = id;
         this.name = name;
         this.e = e; // none
@@ -66,9 +21,13 @@ class CelestialBody {
         this.t0 = t0; // julian Days
         this.n = n; // deg per day
         this.rot_per = rot_per; //periodo de rotacion en dias
-        this.tamaño = size[id];
+        this.diameter = diameter; //diámetro del cuerpo en km
+        this.textura = textura;
+        this.color_orbita = color_orbita;
+        this.SCALE_SIZE = 0.00001436;
+        this.tamaño = diameter / 2 * this.SCALE_SIZE;
         this.posicion = [0,0,0];
-        this.textura = textura[id];
+        
         this.geometry = new THREE.SphereGeometry(this.tamaño, 64, 64);
         this.material = new THREE.MeshStandardMaterial({ map: new THREE.TextureLoader().load(this.textura) });
         this.sphere = new THREE.Mesh(this.geometry, this.material);
@@ -98,7 +57,7 @@ class CelestialBody {
     //cálculo de la anomalía excéntrica
     calcular_E(t) {
         const tol = 1e-6 * Math.PI / 180;
-        const max_iterations = 100;
+        const max_iterations = 10000;
         const e_deg = this.e;
         const L = this.L * Math.PI / 180;
         const w = this.w * Math.PI / 180;
@@ -106,7 +65,6 @@ class CelestialBody {
         const M_0 = L - w;
         const M = n * (t - this.t0) ;
         let E = M_0 - e_deg * Math.sin(M_0);
-        //M = M % (2 * Math.PI);  Asegurarse de que M esté en el rango [0, 2π]
         let delta = 1;
         let iterations = 0;
         while (Math.abs(delta) > tol && iterations < max_iterations) {
@@ -155,7 +113,7 @@ class CelestialBody {
             puntos.push(new THREE.Vector3(x *SCALE_DISTANCE , y * SCALE_DISTANCE, z * SCALE_DISTANCE));
         }
         const geometria = new THREE.BufferGeometry().setFromPoints(puntos);
-        const material = new THREE.LineBasicMaterial({ color: color[i], linewidth: 2 }); // Asegurarse de que el material sea visible
+        const material = new THREE.LineBasicMaterial({ color: this.color_orbita, linewidth: 2 }); // Asegurarse de que el material sea visible
         const orbita = new THREE.Line(geometria, material);
         return orbita;
     }
