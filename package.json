@@ -1,9 +1,9 @@
 {
-  "dependencies": {
-    "@types/three": "^0.169.0",
-    "three": "^0.169.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.7.4"
+  "name": "nasa_space_vlc24",
+  "private": true,
+  "description": "Planetario interactivo del Sistema Solar (NASA Space Challenge VLC 2024)",
+  "license": "MIT",
+  "scripts": {
+    "start": "python3 -m http.server 8000"
   }
 }

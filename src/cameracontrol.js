@@ -1,5 +1,3 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.module.js';
-
 export function updateCameraPosition(camera,cameraData,radius) {
     let phi=cameraData.phi;
     let theta=cameraData.theta;

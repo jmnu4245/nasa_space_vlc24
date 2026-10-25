@@ -1,18 +1,21 @@
+const MS_POR_DIA = 86400000;
+const JD_UNIX = 2440587.5; // día juliano de 1970-01-01 00:00 UTC
+
+// Día juliano (con fracción) de un objeto Date
+export function dateToJulian(fecha) {
+    return fecha.getTime() / MS_POR_DIA + JD_UNIX;
+}
+
 export function calcularDiaJulianoActual() {
-    const fechaActual = new Date();
-    const anio = fechaActual.getFullYear();
-    const mes = fechaActual.getMonth() + 1; // Los meses comienzan en 0
-    const dia = fechaActual.getDate();
-  
-    // Algoritmo para calcular el día juliano
-    const A = Math.floor((14 - mes) / 12);
-    const Y = anio + 4800 - A;
-    const M = mes + 12 * A - 3;
-  
-    const diaJuliano = dia + Math.floor((153 * M + 2) / 5) + (365 * Y) + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
-    return diaJuliano;
-  }
-  export function julianToDate(diaJuliano) {
+    return dateToJulian(new Date());
+}
+
+// Día juliano de una fecha "YYYY-MM-DD" (a las 00:00 UTC)
+export function inputToJulian(valor) {
+    return dateToJulian(new Date(`${valor}T00:00:00Z`));
+}
+
+export function julianToDate(diaJuliano) {
     // Constantes del calendario juliano
     let j = diaJuliano + 0.5;
     let z = Math.floor(j);
