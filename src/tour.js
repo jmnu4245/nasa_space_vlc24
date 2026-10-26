@@ -1,4 +1,5 @@
 import { tr } from './i18n.js';
+import { decodificar } from './hud.js';
 
 const $ = id => document.getElementById(id);
 const DURACION = 10000; // ms por parada
@@ -112,7 +113,7 @@ export default class Tour {
         const paso = PASOS[this.indice];
         const texto = $('cine-texto');
         $('cine-paso').textContent = `${String(this.indice + 1).padStart(2, '0')} / ${String(PASOS.length).padStart(2, '0')}`;
-        $('cine-titulo').textContent = tr(paso.titulo);
+        decodificar($('cine-titulo'), tr(paso.titulo), 900);
         $('cine-subtitulo').textContent = tr(paso.texto);
         texto.classList.remove('entrando');
         void texto.offsetWidth; // reinicia la animación de entrada

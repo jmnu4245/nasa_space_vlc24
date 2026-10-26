@@ -1,5 +1,6 @@
 import { t, tr, idioma, setIdioma, aplicarTraducciones } from './i18n.js';
 import PanelCalculos from './panelCalculos.js';
+import { decodificar } from './hud.js';
 import { julianToDate, dateToJulian } from './julianthings.js';
 
 const $ = id => document.getElementById(id);
@@ -103,7 +104,11 @@ export function crearUI(app) {
         if (!generarFicha) return;
         const f = generarFicha();
         $('ficha-tipo').textContent = f.tipo;
-        $('ficha-nombre').textContent = f.nombre;
+        // El nombre se "decodifica" al cambiar de objeto; en los repintados periódicos se deja quieto
+        if ($('ficha-nombre').dataset.nombre !== f.nombre) {
+            $('ficha-nombre').dataset.nombre = f.nombre;
+            decodificar($('ficha-nombre'), f.nombre);
+        }
         $('ficha-info').innerHTML = (f.texto ? `<p>${f.texto}</p>` : '') +
             f.filas.map(([k, v]) => `<div class="fila"><span>${k}</span><b>${v}</b></div>`).join('') +
             (f.nota ? `<p class="nota">${f.nota}</p>` : '');
@@ -114,10 +119,11 @@ export function crearUI(app) {
     }
 
     let fichaViva = false;   // la ficha se repinta periódicamente (datos que cambian: naves)
-    function mostrarFicha(generador, cuerpo, { vivo = false } = {}) {
+    function mostrarFicha(generador, cuerpo, { vivo = false, cielo = false } = {}) {
         generarFicha = generador;
         cuerpoFicha = cuerpo;
         fichaViva = vivo;
+        $('ficha-cielo').hidden = !cielo;
         panel.reiniciar(cuerpo, app.getTiempo());
         pintarFicha();
         ficha.hidden = false;
@@ -131,6 +137,52 @@ export function crearUI(app) {
         ficha.hidden = true;
     }
     $('ficha-cerrar').addEventListener('click', () => app.vistaGeneral());
+    $('ficha-cielo').addEventListener('click', () => app.verCielo());
+
+    // ---------- Foto, sonido y vista desde la superficie ----------
+    $('btn-foto').addEventListener('click', () => app.hacerFoto());
+    $('btn-sonido').addEventListener('click', () => app.alternarSonido());
+    $('hud-salir').addEventListener('click', () => app.salirSuperficie());
+    function setSonido(activo) {
+        $('btn-sonido').innerHTML = `<svg><use href="#${activo ? 'i-sonido' : 'i-silencio'}"/></svg>`;
+        $('btn-sonido').classList.toggle('apagado', !activo);
+    }
+    // Un clic suave en cualquier botón de la interfaz
+    document.addEventListener('click', e => { if (e.target.closest('button, .etiqueta, .evento')) app.sonidoClic(); }, true);
+
+    // Brújula: marcas cada 5° y puntos cardinales cada 45°, repetidas para poder girar sin cortes
+    const PX_POR_GRADO = 4;
+    function pintarBrujula() {
+        let html = '';
+        for (let g = -360; g <= 720; g += 5) {
+            const x = g * PX_POR_GRADO;
+            const normal = ((g % 360) + 360) % 360;
+            html += `<span class="${normal % 45 === 0 ? 'mayor' : ''}" style="left:${x}px"></span>`;
+            if (normal % 45 === 0) html += `<b style="left:${x}px">${t('puntosCardinales')[normal / 45]}</b>`;
+            else if (normal % 15 === 0) html += `<b style="left:${x}px;opacity:.45;font-weight:500">${normal}</b>`;
+        }
+        $('hud-escala').innerHTML = html;
+    }
+    function setModoSuperficie(activo) {
+        document.body.classList.toggle('modo-superficie', activo);
+        $('hud-superficie').hidden = !activo;
+        if (activo) {
+            pintarBrujula();
+            abrirPanel(null);
+        }
+    }
+    function actualizarHUD({ mundo, lugar, lat, lon, altSol, rumbo, horaSolar }) {
+        const titulo = lugar ? `${lugar} · ${mundo}` : mundo;
+        if ($('hud-mundo').dataset.titulo !== titulo) {
+            $('hud-mundo').dataset.titulo = titulo;
+            decodificar($('hud-mundo'), titulo, 900);
+        }
+        const fmtCoord = (v, pos, neg) => `${Math.abs(v).toFixed(2)}° ${v >= 0 ? pos : neg}`;
+        $('hud-coordenadas').textContent = `${fmtCoord(lat, 'N', 'S')}   ${fmtCoord(lon, 'E', idioma === 'es' ? 'O' : 'W')}` +
+            (horaSolar ? ` · ${t('horaSolar', horaSolar)}` : '');
+        $('hud-sol').textContent = altSol >= 0 ? t('solSobre', Math.round(altSol)) : t('solBajo', Math.round(-altSol));
+        $('hud-escala').style.transform = `translateX(${-rumbo * PX_POR_GRADO}px)`;
+    }
 
     // Método de cálculo
     function explicarMetodo(metodo) {
@@ -358,6 +410,7 @@ export function crearUI(app) {
         pintarNavegacion();
         pintarAyuda();
         if (!PANELES.eventos.hidden) pintarEventos();
+        if (document.body.classList.contains('modo-superficie')) pintarBrujula();
         explicarMetodo(document.querySelector('.segmentado button.activo').dataset.metodo);
         aplicarVelocidad();
         if (pestaña === 'fisica') panel.actualizar(app.getTiempo());
@@ -381,7 +434,10 @@ export function crearUI(app) {
             case 'ArrowLeft': cambiarVelocidad(-1); break;
             case 'r': case 'R': invertir(); break;
             case '/': e.preventDefault(); buscador.focus(); break;
-            case 'Escape': if (!app.cancelarRegla()) app.vistaGeneral(); break;
+            case 'Escape': if (!app.salirSuperficie() && !app.cancelarRegla()) app.vistaGeneral(); break;
+            case 'v': case 'V': app.verCielo(); break;
+            case 'f': case 'F': app.hacerFoto(); break;
+            case 's': case 'S': app.alternarSonido(); break;
             case 't': case 'T': app.iniciarTour(); break;
             case 'm': case 'M': app.alternarRegla(); break;
             case 'e': case 'E': alternarCapa('escalaReal'); break;
@@ -452,6 +508,9 @@ export function crearUI(app) {
     if (!leer('ayudaVista')) setTimeout(abrirAyuda, 1200);
 
     return {
+        setSonido,
+        setModoSuperficie,
+        actualizarHUD,
         mostrarFicha,
         ocultarFicha,
         marcarNavegacion,

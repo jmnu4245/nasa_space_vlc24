@@ -21,6 +21,12 @@ import { configurarHD, registrarHD, actualizarHD } from './texturasHD.js';
 import { gmst } from './efemerides.js';
 import { generarEventos } from './eventos.js';
 import { crearUI } from './ui.js';
+import Sonido from './sonido.js';
+import Cartografia from './cartografia.js';
+import HUD, { decodificar } from './hud.js';
+import { crearPaseCine } from './postproceso.js';
+import { kepler } from './calculos.js';
+import VistaSuperficie, { CIELOS } from './superficie.js';
 import { t, tr, idioma } from './i18n.js';
 import { PLANETAS, POLOS, ENANOS, LUNAS, FICHAS, SCALE_SIZE, SCALE_DISTANCE } from './datos.js';
 
@@ -28,6 +34,7 @@ const $ = id => document.getElementById(id);
 const guardar = (clave, valor) => { try { localStorage.setItem(clave, valor); } catch (e) { /* sin almacenamiento */ } };
 const local = () => (idioma === 'es' ? 'es-ES' : 'en-GB');
 const fmt = (x, d = 4) => x.toLocaleString(local(), { maximumSignificantDigits: d });
+const fmtAños = x => x.toLocaleString(local(), { minimumSignificantDigits: 4, maximumSignificantDigits: 4 }); // 1,000 años
 const nombreLocal = o => (idioma === 'es' || !o.en ? o.nombre : o.en);
 const esMovil = window.matchMedia('(max-width: 700px), (pointer: coarse)').matches;
 const UA_KM = 149597870.7;
@@ -35,12 +42,35 @@ const KM_POR_UNIDAD = UA_KM / SCALE_DISTANCE;
 // Factor que lleva los tamaños ampliados a la misma escala que las distancias (≈ 1/43)
 const FACTOR_REAL = SCALE_DISTANCE / (UA_KM * SCALE_SIZE);
 
-// ---------- Pantalla de carga ----------
+// ---------- Pantalla de carga: secuencia de arranque ----------
 const ocultarCarga = () => $('carga').classList.add('oculta');
+function lineaArranque(texto, pendiente = false) {
+    const li = document.createElement('li');
+    li.textContent = texto;
+    li.classList.toggle('pendiente', pendiente);
+    $('carga-log').appendChild(li);
+    return li;
+}
+const pasosArranque = t('arranque');
+lineaArranque(pasosArranque[0]);
+lineaArranque(pasosArranque[1]);
+lineaArranque(t('arranque')[2].replace('{0}', new Date().toISOString().slice(11, 19)));
+const lineaTexturas = lineaArranque(pasosArranque[3].replace('{0}', 0).replace('{1}', '…'), true);
+let texturasListas = false, catalogoListo = false;
+function quizaTerminarArranque() {
+    if (!texturasListas || !catalogoListo) return;
+    lineaArranque(pasosArranque[5]);
+    setTimeout(ocultarCarga, 500);
+}
 THREE.DefaultLoadingManager.onProgress = (url, cargados, total) => {
     $('carga-progreso').style.width = `${100 * cargados / total}%`;
+    lineaTexturas.textContent = pasosArranque[3].replace('{0}', cargados).replace('{1}', total);
 };
-THREE.DefaultLoadingManager.onLoad = ocultarCarga;
+THREE.DefaultLoadingManager.onLoad = () => {
+    lineaTexturas.classList.remove('pendiente');
+    texturasListas = true;
+    quizaTerminarArranque();
+};
 setTimeout(ocultarCarga, 20000); // por si alguna textura no llega nunca
 
 // ---------- Escena y render ----------
@@ -57,6 +87,8 @@ configurarHD(renderer);
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 composer.addPass(new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.9, 0.6, 1.0));
+const paseCine = crearPaseCine();
+composer.addPass(paseCine);
 composer.addPass(new OutputPass());
 
 window.addEventListener('resize', () => {
@@ -64,7 +96,9 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
     composer.setSize(window.innerWidth, window.innerHeight);
+    paseCine.redimensionar(window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio());
 });
+paseCine.redimensionar(window.innerWidth * renderer.getPixelRatio(), window.innerHeight * renderer.getPixelRatio());
 setupLighting(scene);
 
 // Vía Láctea de fondo (versión más ligera en el móvil); su brillo se regula desde Capas
@@ -139,6 +173,8 @@ const cometas = new CuerposMenores(0xf2f4f8, 5);
 const colas = new Colas(cometas);
 const cinturones = new Cinturones();
 const naves = new Naves();
+const carta = new Cartografia();
+scene.add(carta.grupo);
 scene.add(asteroides.points, cometas.points, colas.grupo, cinturones.grupo, naves.grupo);
 
 // "1 Ceres (A801 AA)" → "Ceres", "1P/Halley" → "Halley"
@@ -146,6 +182,13 @@ function nombreCorto(completo) {
     const sinDesignacion = completo.replace(/\s*\([^)]*\)\s*$/, '');
     return sinDesignacion.match(/^\d+\s+(.+)$/)?.[1] ?? sinDesignacion.match(/^\d*[PCDI]\/(.+)$/)?.[1] ?? sinDesignacion;
 }
+
+// ---------- Sonido ambiental ----------
+const sonido = new Sonido();
+for (const evento of ['pointerdown', 'keydown']) window.addEventListener(evento, () => sonido.iniciar(), { once: true });
+let movimientoCamara = 0;   // giro acumulado en el fotograma (rad), para el viento
+let panViento = 0;
+let vientoSuave = 0;
 
 // ---------- Estado ----------
 let tiempo = calcularDiaJulianoActual();
@@ -203,6 +246,7 @@ function enfocar(objeto, radioFinal, radioMinimo, { phi = null, direccion = null
         inicio: performance.now(), duracion: 1300 + Math.min(1700, distancia * 1.5), radio: true
     };
     objetivo = objeto;
+    if (distancia > radioFinal * 2 || Math.abs(Math.log(radius / radioFinal)) > 1) sonido.vuelo(transicion.duracion / 1000);
 }
 
 function seguirObjetivo() {
@@ -243,6 +287,7 @@ function resaltarOrbita(orbita) {
 }
 
 function marcar(id, objeto3d) {
+    if (id && id !== idSeleccionado) sonido.seleccion();
     idSeleccionado = id;
     ui.marcarNavegacion(id ?? 'vista-general');
     etiquetas.marcarSeleccionado(objeto3d);
@@ -265,9 +310,9 @@ function seleccionarPrincipal(cuerpo) {
         texto: tr(fichaDatos.texto),
         filas: [
             ...filasFicha(cuerpo.nombre),
-            ...(cuerpo.fijo ? [] : [[t('periodoOrbital'), `${fmt(cuerpo.periodo() / 365.25)} ${t('anios')}`]])
+            ...(cuerpo.fijo ? [] : [[t('periodoOrbital'), `${fmtAños(cuerpo.periodo() / 365.25)} ${t('anios')}`]])
         ]
-    }), cuerpo.fijo ? null : cuerpo);
+    }), cuerpo.fijo ? null : cuerpo, { cielo: !cuerpo.fijo });
 }
 
 function seleccionarLuna(l) {
@@ -287,7 +332,7 @@ function seleccionarLuna(l) {
             [t('distanciaPlaneta'), `${fmt(l.precisa ? l.offsetKm.length() : d.distancia)} km`],
             [t('periodoOrbital'), `${fmt(Math.abs(d.periodo))} ${t('dias')}${d.periodo < 0 ? ` (${t('retrograda')})` : ''}`]
         ]
-    }), null, { vivo: l.precisa });
+    }), null, { vivo: l.precisa, cielo: true });
 }
 
 function seleccionarMenor(nube, i) {
@@ -325,7 +370,7 @@ function seleccionarMenor(nube, i) {
             ...(cuerpo.rotacion ? [[t('rotacion'), `${fmt(cuerpo.rotacion * 24)} ${t('horas')}`]] : []),
             [t('semieje'), `${fmt(cuerpo.a)} UA`],
             [t('excentricidad'), fmt(cuerpo.e)],
-            [t('periodoOrbital'), `${fmt(cuerpo.periodo() / 365.25)} ${t('anios')}`]
+            [t('periodoOrbital'), `${fmtAños(cuerpo.periodo() / 365.25)} ${t('anios')}`]
         ],
         nota: roca.modeloReal ? t('formaReal') : ''
     }), cuerpo);
@@ -409,7 +454,7 @@ const regla = {
     activa: false,
     puntos: [],
     linea: new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]),
-        new THREE.LineDashedMaterial({ color: 0xffffff, dashSize: 0.5, gapSize: 0.5, transparent: true, opacity: 0.9, depthTest: false }))
+        new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85, depthTest: false }))
 };
 regla.linea.visible = false;
 regla.linea.frustumCulled = false;
@@ -438,8 +483,6 @@ function actualizarRegla() {
     posiciones.setXYZ(0, ...a.objeto3d.position.toArray());
     posiciones.setXYZ(1, ...b.objeto3d.position.toArray());
     posiciones.needsUpdate = true;
-    regla.linea.computeLineDistances();
-    regla.linea.material.dashSize = regla.linea.material.gapSize = a.objeto3d.position.distanceTo(b.objeto3d.position) / 80;
     regla.linea.visible = true;
     const km = a.km(vA).distanceTo(b.km(vB));
     // Etiqueta en el punto medio de la línea, sobre la pantalla
@@ -526,6 +569,108 @@ function actualizarEscala() {
     if (k >= 1) escala.transicion = null;
 }
 
+// ---------- Vista desde la superficie ----------
+const superficie = new VistaSuperficie(scene);
+
+function verCielo() {
+    if (superficie.activa) return;
+    const principal = porNombre[idSeleccionado];
+    const l = lunas.find(m => m.nombre === idSeleccionado);
+    if ((!principal && !l) || principal?.fijo) {
+        ui.avisar(t('verCielo'), 1500);
+        return;
+    }
+    const cuerpo = principal ?? { nombre: l.nombre, mesh: l.mesh, esfera: l.mesh, tamaño: l.tamaño, planeta: l.planeta };
+    // Los planetas se marcan con puntos de luz para encontrarlos desde cualquier distancia
+    const astros = principales.filter(c => !c.fijo && c !== principal).map(c => c.mesh);
+    superficie.activar(cuerpo, astros, sol.mesh.position);
+    // Las etiquetas de lo que queda detrás del propio astro se ocultan
+    etiquetas.filtro = objeto => objeto !== cuerpo.mesh && superficie.sobreHorizonte(objeto);
+    cercania.objetivo = 0;
+    ui.setModoSuperficie(true);
+    sonido.vuelo(1.6);
+}
+
+function salirSuperficie() {
+    if (!superficie.activa) return false;
+    superficie.desactivar();
+    superficie.restaurarCamara(camera);
+    etiquetas.filtro = null;
+    ui.setModoSuperficie(false);
+    const id = idSeleccionado;
+    idSeleccionado = null;
+    registro.get(id)?.seleccionar();
+    return true;
+}
+
+// Hora solar local en la Tierra (la longitud desplaza 1 h cada 15°)
+function horaSolarLocal(lon) {
+    const utc = ((tiempo + 0.5) % 1) * 24;
+    const h = (utc + lon / 15 + 48) % 24;
+    return `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.floor((h % 1) * 60)).padStart(2, '0')}`;
+}
+
+// ---------- Foto ----------
+// Renderiza la escena al doble de resolución (hasta 4096 px de ancho), sin interfaz, con un pie de foto discreto
+function hacerFoto() {
+    sonido.obturador();
+    const flash = $('flash');
+    flash.classList.remove('disparo');
+    void flash.offsetWidth;
+    flash.classList.add('disparo');
+
+    const original = renderer.getPixelRatio();
+    const ratio = original * Math.max(1, Math.min(2, 4096 / (window.innerWidth * original)));
+    renderer.setPixelRatio(ratio);
+    composer.setPixelRatio(ratio);
+    composer.setSize(window.innerWidth, window.innerHeight);
+    composer.render();
+    const origen = renderer.domElement;
+    const lienzo = document.createElement('canvas');
+    lienzo.width = origen.width;
+    lienzo.height = origen.height;
+    const ctx = lienzo.getContext('2d');
+    ctx.drawImage(origen, 0, 0); // en el mismo instante del render, antes de que se borre el búfer
+    renderer.setPixelRatio(original);
+    composer.setPixelRatio(original);
+    composer.setSize(window.innerWidth, window.innerHeight);
+
+    // Pie de foto: nombre, fecha UTC y firma
+    const u = lienzo.width / 1600;
+    const sombra = ctx.createLinearGradient(0, lienzo.height * 0.72, 0, lienzo.height);
+    sombra.addColorStop(0, 'rgba(0,0,0,0)');
+    sombra.addColorStop(1, 'rgba(0,0,0,0.6)');
+    ctx.fillStyle = sombra;
+    ctx.fillRect(0, lienzo.height * 0.72, lienzo.width, lienzo.height * 0.28);
+    const entrada = registro.get(idSeleccionado);
+    const titulo = superficie.activa
+        ? `${superficie.lugar.nombre ? `${superficie.lugar.nombre} · ` : ''}${entrada?.nombre() ?? ''}`
+        : entrada?.nombre() ?? t('titulo');
+    const fecha = new Date((tiempo - 2440587.5) * 86400000);
+    const fechaTexto = Number.isNaN(fecha.getTime()) ? '' : `${fecha.toISOString().slice(0, 16).replace('T', '  ')} UTC`;
+    const fuente = "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif";
+    ctx.fillStyle = '#fff';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = `600 ${Math.round(34 * u)}px ${fuente}`;
+    ctx.fillText(titulo.toUpperCase().split('').join(String.fromCharCode(8202)), 56 * u, lienzo.height - 88 * u);
+    ctx.fillStyle = 'rgba(255,255,255,0.65)';
+    ctx.font = `500 ${Math.round(15 * u)}px ${fuente}`;
+    ctx.fillText(fechaTexto, 56 * u, lienzo.height - 56 * u);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText('NASA SPACE APPS · VALENCIA', lienzo.width - 56 * u, lienzo.height - 56 * u);
+
+    lienzo.toBlob(blob => {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const nombre = normalizar(titulo).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sistema-solar';
+        a.download = `${nombre}-${fecha.toISOString?.().slice(0, 10) ?? ''}.png`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+        ui.avisar(t('fotoGuardada'));
+    }, 'image/png');
+}
+
 // ---------- Recorrido guiado ----------
 let estadoPrevioTour = null;
 const app = {
@@ -547,6 +692,7 @@ const app = {
             case 'lunas': lunas.forEach(l => { l.mesh.visible = l.orbita.visible = valor; }); break;
             case 'naves': naves.grupo.visible = valor; break;
             case 'cinturones': cinturones.grupo.visible = valor; break;
+            case 'cartografia': carta.grupo.visible = valor; break;
             case 'colas': colas.grupo.visible = valor; break;
             case 'escalaReal': setEscalaReal(valor); break;
             case 'asteroides': asteroides.setCantidad(valor); break;
@@ -579,13 +725,24 @@ const app = {
         return true;
     },
     iniciarTour: () => tour.iniciar(),
+    verCielo,
+    salirSuperficie,
+    hacerFoto,
+    sonidoClic: () => sonido.clic(),
+    alternarSonido() {
+        sonido.setActivo(!sonido.activo);
+        ui.setSonido(sonido.activo);
+        ui.avisar(t(sonido.activo ? 'sonidoActivado' : 'sonidoDesactivado'), 1500);
+    },
     alEmpezarTour() {
-        estadoPrevioTour = ui.estadoVelocidad;
+        estadoPrevioTour = { ...ui.estadoVelocidad, carta: carta.grupo.visible };
+        carta.grupo.visible = false; // en modo cine la carta celeste sobra
         if (regla.activa) alternarRegla();
         orbitaAutomatica = 0.05;
     },
     alTerminarTour() {
         orbitaAutomatica = 0;
+        carta.grupo.visible = estadoPrevioTour.carta;
         ui.setVelocidadDesdeURL(estadoPrevioTour.indice, estadoPrevioTour.sentido);
         vistaGeneral();
     },
@@ -620,18 +777,32 @@ const app = {
 
 const etiquetas = new Etiquetas($('etiquetas'));
 const ui = crearUI(app);
+ui.setSonido(sonido.activo);
 const tour = new Tour(app);
 
 // ---------- Etiquetas ----------
-principales.forEach(c => etiquetas.añadir(() => nombreLocal(c), c.mesh, () => seleccionarPrincipal(c)));
+// Con la regla activa, pulsar una etiqueta añade ese objeto a la medida en lugar de seleccionarlo
+const accion = id => () => {
+    const entrada = registro.get(id);
+    if (!entrada || superficie.activa) return;
+    if (regla.activa) añadirPuntoRegla(entrada);
+    else entrada.seleccionar();
+};
+principales.forEach(c => etiquetas.añadir(() => nombreLocal(c), c.mesh, accion(c.nombre)));
+// Rótulos de la carta celeste (grados de la eclíptica y constelaciones)
+for (const a of carta.anclas) {
+    const texto = typeof a.texto === 'string' ? a.texto : () => (idioma === 'es' ? a.texto.es : a.texto.en);
+    etiquetas.añadir(texto, a.objeto, null, () => carta.grupo.visible);
+    etiquetas.items.at(-1).el.classList.add(a.clase);
+}
 // Las lunas solo se etiquetan con la cámara cerca de su planeta
-lunas.forEach(l => etiquetas.añadir(() => nombreLocal(l), l.mesh, () => seleccionarLuna(l),
+lunas.forEach(l => etiquetas.añadir(() => nombreLocal(l), l.mesh, accion(l.nombre),
     cam => l.mesh.visible && cam.position.distanceTo(l.planeta.mesh.position) < 8 * l.distancia * escala.valor, true));
 
 // Cada asteroide/cometa tiene etiqueta clicable, visible si está activo y la cámara está cerca
 function prepararMenores(nube, tipo) {
     nube.cuerpos.forEach((cuerpo, i) => {
-        etiquetas.añadir(nombreCorto(cuerpo.nombre), { position: nube.vectores[i] }, () => seleccionarMenor(nube, i),
+        etiquetas.añadir(nombreCorto(cuerpo.nombre), { position: nube.vectores[i] }, accion(`${tipo === 'cometa' ? 'com' : 'ast'}-${cuerpo.spkid}`),
             cam => i < nube.cantidad && cam.position.distanceTo(nube.vectores[i]) < 250, true);
         const posicion = { get position() { return menorSel?.cuerpo === cuerpo ? menorSel.roca.position : nube.vectores[i]; } };
         registrar({ id: `${tipo === 'cometa' ? 'com' : 'ast'}-${cuerpo.spkid}`, tipo, nombre: () => nombreCorto(cuerpo.nombre),
@@ -652,8 +823,11 @@ const cargaMenores = Promise.all([
         prepararMenores(cometas, 'cometa');
     }),
     naves.cargar('../datos/naves.json').then(() => {
+        lineaArranque(pasosArranque[4].replace('{0}', asteroides.cuerpos.length + 1).replace('{1}', cometas.cuerpos.length).replace('{2}', naves.lista.length));
+        catalogoListo = true;
+        quizaTerminarArranque();
         for (const nave of naves.lista) {
-            etiquetas.añadir(nave.nombre, nave.marcador, () => seleccionarNave(nave), () => nave.marcador.visible && naves.grupo.visible);
+            etiquetas.añadir(nave.nombre, nave.marcador, accion(`nave-${nave.nombre}`), () => nave.marcador.visible && naves.grupo.visible);
             etiquetas.items.at(-1).el.classList.add('nave');
             registrar({ id: `nave-${nave.nombre}`, tipo: 'nave', nombre: () => nave.nombre, claves: [nave.nombre],
                 seleccionar: () => seleccionarNave(nave), objeto3d: nave.marcador, km: kmHelio(nave.marcador) });
@@ -677,7 +851,6 @@ if (objetoInicial) {
 
 // ---------- Bucle de animación ----------
 const reloj = new THREE.Clock();
-animate();
 function animate() {
     requestAnimationFrame(animate);
     const dt = Math.min(reloj.getDelta(), 0.1);
@@ -711,12 +884,128 @@ function animate() {
     const atenuacion = THREE.MathUtils.clamp(radius / 60, 0.2, 1);
     for (const o of orbitas) if (o !== orbitaResaltada) o.material.opacity = OPACIDAD_ORBITA * atenuacion * (o.material.isLineDashedMaterial ? 0.7 : 1);
 
-    cameraData.theta += orbitaAutomatica * dt;
-    seguirObjetivo();
-    updateCameraPosition(camera, cameraData, radius);
+    if (superficie.activa) {
+        superficie.actualizar(camera, sol.mesh.position);
+        const { lugar } = superficie;
+        ui.actualizarHUD({
+            mundo: registro.get(idSeleccionado)?.nombre() ?? '', lugar: lugar.nombre, lat: lugar.lat, lon: lugar.lon,
+            altSol: superficie.altSol, rumbo: superficie.rumbo,
+            horaSolar: idSeleccionado === 'Tierra' ? horaSolarLocal(lugar.lon) : null
+        });
+    } else {
+        cameraData.theta += orbitaAutomatica * dt;
+        movimientoCamara += Math.abs(orbitaAutomatica * dt);
+        seguirObjetivo();
+        updateCameraPosition(camera, cameraData, radius);
+    }
+    actualizarSonido(dt, dias);
+    carta.actualizar(camera);
+    actualizarHUDEscena(dt);
     composer.render();
     etiquetas.actualizar(camera);
     actualizarRegla();
+}
+
+// ---------- HUD de instrumentación ----------
+const hud = new HUD();
+const raycasterSol = new THREE.Raycaster();
+const fmtKm = km => (km < 1e7 ? `${fmt(km, 4)} km` : `${fmt(km / UA_KM, 4)} UA`);
+
+// Fracción del disco iluminada vista desde la cámara
+function iluminacion(pos) {
+    const haciaSol = vTmp.copy(pos).negate().normalize();
+    const haciaCamara = new THREE.Vector3().subVectors(camera.position, pos).normalize();
+    return `${Math.round(50 * (1 + haciaSol.dot(haciaCamara)))} %`;
+}
+
+function datosHUD() {
+    if (!idSeleccionado || superficie.activa) return null;
+    const c = porNombre[idSeleccionado];
+    const l = lunas.find(m => m.nombre === idSeleccionado);
+    const nave = naves.lista.find(n => `nave-${n.nombre}` === idSeleccionado);
+    const filas = [];
+    let objeto3d, tamaño = 0, kmPorUnidad = KM_POR_UNIDAD;
+    if (c) {
+        objeto3d = c.mesh;
+        tamaño = c.tamaño * escala.valor;
+        kmPorUnidad = c.radio / tamaño;
+        filas.push([t('tAlt'), fmtKm(Math.max(0, camera.position.distanceTo(c.mesh.position) - tamaño) * kmPorUnidad)]);
+        if (!c.fijo) {
+            filas.push([t('tSol'), `${fmt(c.mesh.position.length() / SCALE_DISTANCE, 4)} UA`]);
+            filas.push([t('tVel'), `${fmt(kepler(c, tiempo).v / 1000, 3)} km/s`]);
+            filas.push([t('tIlum'), iluminacion(c.mesh.position)]);
+        }
+    } else if (l) {
+        objeto3d = l.mesh;
+        tamaño = l.tamaño * escala.valor;
+        kmPorUnidad = l.datos.radio / tamaño;
+        filas.push([t('tAlt'), fmtKm(Math.max(0, camera.position.distanceTo(l.mesh.position) - tamaño) * kmPorUnidad)]);
+        filas.push([t('tDist'), fmtKm(l.offsetKm.length())]);
+        filas.push([t('tIlum'), iluminacion(l.mesh.position)]);
+    } else if (nave) {
+        if (!nave.activa(tiempo)) return null;
+        objeto3d = nave.marcador;
+        filas.push([t('tSol'), `${fmt(nave.distanciaSolUA, 4)} UA`]);
+        filas.push([t('tVel'), `${fmt(nave.velocidad, 3)} km/s`]);
+    } else if (menorSel) {
+        objeto3d = menorSel.roca;
+        tamaño = menorSel.roca.scale.x;
+        filas.push([t('tSol'), `${fmt(menorSel.roca.position.length() / SCALE_DISTANCE, 4)} UA`]);
+        filas.push([t('tVel'), `${fmt(kepler(menorSel.cuerpo, tiempo).v / 1000, 3)} km/s`]);
+        filas.push([t('tIlum'), iluminacion(menorSel.roca.position)]);
+    } else {
+        return null;
+    }
+    return { objeto3d, tamaño, filas, kmPorUnidad };
+}
+
+function actualizarHUDEscena(dt) {
+    const datos = datosHUD();
+    // Kilómetros por píxel a la distancia del objetivo (o del centro de la vista)
+    const d = datos ? camera.position.distanceTo(datos.objeto3d.position) : radius;
+    const unidadesPorPx = 2 * d * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) / window.innerHeight;
+    const kmPorUnidad = datos?.tamaño ? datos.kmPorUnidad : KM_POR_UNIDAD;
+    hud.actualizar(camera, datos, { visible: !superficie.activa && !tour.activo, escalaKm: unidadesPorPx * kmPorUnidad, textoEscala: fmtKm });
+
+    // Destello de lente: solo si nada tapa el Sol (ni el horizonte, en la superficie)
+    const posSol = sol.mesh.position;
+    const dSol = camera.position.distanceTo(posSol);
+    raycasterSol.set(camera.position, vTmp.subVectors(posSol, camera.position).normalize());
+    raycasterSol.far = dSol;
+    const tapadores = [...principales.filter(c => !c.fijo).map(c => c.esfera), ...lunas.map(m => m.mesh)];
+    let visible = raycasterSol.intersectObjects(tapadores, false).length === 0;
+    hud.destello(camera, posSol, sol.tamaño * escala.valor, visible, dt);
+    paseCine.actualizar(performance.now() / 1000);
+}
+
+// Capas continuas del sonido según lo que ocurre en la escena
+function actualizarSonido(dt, dias) {
+    if (!sonido.listo) return;
+    const radioSol = sol.tamaño * escala.valor;
+    const dSol = camera.position.length();
+    const solar = THREE.MathUtils.clamp(1 - Math.log(Math.max(dSol, radioSol) / radioSol) / Math.log(40), 0, 1);
+    // Lejanía: crece desde la órbita de Marte hasta más allá de Neptuno
+    const lejania = THREE.MathUtils.clamp(Math.log(Math.max(dSol, 80) / 80) / Math.log(25), 0, 1);
+    // Hogar: cercanía a la Tierra (máximo junto a ella, se desvanece a unos 200 radios)
+    const radioTierra = tierra.tamaño * escala.valor;
+    const dTierra = Math.max(camera.position.distanceTo(tierra.mesh.position), radioTierra);
+    const hogar = THREE.MathUtils.clamp(1 - Math.log(dTierra / radioTierra) / Math.log(200), 0, 1);
+    // Viento: velocidad de giro de la cámara × cercanía al astro × densidad de su atmósfera
+    const velocidadGiro = movimientoCamara / Math.max(dt, 1e-3);
+    movimientoCamara = 0;
+    const atmosfera = CIELOS[idSeleccionado]?.densidad ?? (idSeleccionado ? 0.2 : 0);
+    let viento;
+    if (superficie.activa) {
+        viento = superficie.atmosfera * (0.08 + 0.5 * Math.min(1, velocidadGiro / 3));
+    } else {
+        const cercaniaAstro = idSeleccionado
+            ? THREE.MathUtils.clamp(1 - Math.log(Math.max(radius, minZoom) / minZoom) / Math.log(30), 0, 1) : 0;
+        viento = Math.min(1, velocidadGiro / 3) * cercaniaAstro * (0.3 + 0.7 * atmosfera);
+    }
+    vientoSuave += (viento - vientoSuave) * Math.min(1, dt * 6);
+    panViento *= Math.exp(-dt * 3);
+    const rapidez = dias === 0 ? 0 : THREE.MathUtils.clamp((Math.log10(Math.abs(diasPorSegundo) * 86400) - 4.5) / 4, 0, 1);
+    sonido.actualizar({ solar, hogar, lejania, viento: vientoSuave, pan: panViento, rapidez });
 }
 
 // Busca el objeto más cercano al puntero (en píxeles, descontando su radio aparente en pantalla)
@@ -798,6 +1087,14 @@ let inicioClic = null;
 const distanciaDedos = (a, b) => Math.hypot(a.pageX - b.pageX, a.pageY - b.pageY);
 
 function girar(x, y) {
+    const dx = x - previous.x, dy = y - previous.y;
+    movimientoCamara += (Math.abs(dx) + Math.abs(dy)) * movementScale;
+    panViento = THREE.MathUtils.clamp(panViento + dx * 0.01, -1, 1);
+    if (superficie.activa) {
+        superficie.mirar(-dx, -dy); // se "agarra" el cielo
+        previous = { x, y };
+        return;
+    }
     cameraData.theta += (x - previous.x) * movementScale;
     cameraData.phi -= (y - previous.y) * movementScale;
     cameraData.phi = Math.max(0.05, Math.min(Math.PI - 0.05, cameraData.phi)); // evita voltear la cámara
@@ -809,6 +1106,8 @@ function girar(x, y) {
 }
 
 function zoom(factor) {
+    movimientoCamara += Math.abs(Math.log(factor)) * 1.5;
+    if (superficie.activa) return superficie.zoom(factor);
     if (transicion) transicion.radio = false; // el usuario manda sobre el zoom durante el vuelo
     radius = Math.max(minZoom, Math.min(maxZoom, radius * factor));
 }
@@ -830,6 +1129,7 @@ function objetoEnPantalla(x, y) {
 }
 
 function clicEnEscena(x, y) {
+    if (superficie.activa) return;
     const entrada = objetoEnPantalla(x, y);
     if (!entrada) return;
     if (regla.activa) añadirPuntoRegla(entrada);
@@ -855,6 +1155,7 @@ window.addEventListener('mousemove', event => {
         etiquetas.marcarCerca(null);
         return;
     }
+    if (superficie.activa) return;
     raycaster.setFromCamera(new THREE.Vector2(event.clientX / window.innerWidth * 2 - 1, -event.clientY / window.innerHeight * 2 + 1), camera);
     rayoCursor = raycaster.ray.clone();
     actualizarCercania(event.clientX, event.clientY);
@@ -894,3 +1195,6 @@ renderer.domElement.addEventListener('touchend', event => {
         inicioClic = null;
     }
 });
+
+// Arranque del bucle, cuando todo el módulo está definido
+animate();

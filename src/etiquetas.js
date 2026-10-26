@@ -6,6 +6,7 @@ export default class Etiquetas {
         this.contenedor = contenedor;
         this.items = [];
         this.visibles = true;
+        this.filtro = null; // filtro global opcional: filtro(objeto3d) → visible
         this.v = new THREE.Vector3();
     }
 
@@ -57,7 +58,8 @@ export default class Etiquetas {
         const ancho = window.innerWidth, alto = window.innerHeight;
         for (const { el, objeto3d, visibleSi } of this.items) {
             this.v.copy(objeto3d.position).project(camera);
-            const visible = this.v.z < 1 && Math.abs(this.v.x) < 1.1 && Math.abs(this.v.y) < 1.1 && (!visibleSi || visibleSi(camera));
+            const visible = this.v.z < 1 && Math.abs(this.v.x) < 1.1 && Math.abs(this.v.y) < 1.1 && (!visibleSi || visibleSi(camera)) &&
+                (!this.filtro || this.filtro(objeto3d));
             if (el.hidden === visible) el.hidden = !visible;
             if (visible) el.style.transform = `translate(${(this.v.x * 0.5 + 0.5) * ancho}px, ${(-this.v.y * 0.5 + 0.5) * alto}px) translate(-50%, calc(-100% - 8px))`;
         }

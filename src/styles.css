@@ -9,6 +9,8 @@
 
 :root {
   --fuente: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --serif: 'Instrument Serif', 'Times New Roman', Georgia, serif;
+  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
   --vidrio: linear-gradient(180deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.025) 45%, rgba(255, 255, 255, 0.01) 100%),
             rgba(10, 10, 12, 0.5);
@@ -49,6 +51,15 @@ body {
   letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Arrastrar para girar la cámara no debe seleccionar texto de la interfaz */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+#ficha-info p {
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 canvas {
@@ -451,10 +462,11 @@ svg {
 
 #ficha-nombre {
   margin: 6px 0 0;
-  font-size: 26px;
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  font-family: var(--serif);
+  font-size: 38px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
   background: var(--metal-texto);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1182,9 +1194,10 @@ body.modo-cine #etiquetas {
 
 #cine-titulo {
   margin: 8px 0 10px;
-  font-size: clamp(30px, 4.6vw, 64px);
-  font-weight: 600;
-  letter-spacing: -0.035em;
+  font-family: var(--serif);
+  font-size: clamp(44px, 7vw, 104px);
+  font-weight: 400;
+  letter-spacing: -0.015em;
   line-height: 1;
   background: var(--metal-texto);
   -webkit-background-clip: text;
@@ -1279,9 +1292,10 @@ body.modo-cine #etiquetas {
 
 .modal h2 {
   margin: 0 0 20px;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.025em;
+  font-family: var(--serif);
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   background: var(--metal-texto);
   -webkit-background-clip: text;
   background-clip: text;
@@ -1526,5 +1540,468 @@ body.modo-cine #etiquetas {
 
   #aviso {
     bottom: 150px;
+  }
+}
+
+/* =========================================================================
+   Botones de la ficha
+   ========================================================================= */
+.ficha-botones {
+  display: flex;
+  gap: 4px;
+}
+
+/* =========================================================================
+   Vista desde la superficie
+   ========================================================================= */
+body.modo-superficie #ficha,
+body.modo-superficie .panel-lateral,
+body.modo-superficie #arco,
+body.modo-superficie #barra-superior .buscador,
+body.modo-superficie #btn-eventos,
+body.modo-superficie #btn-tour,
+body.modo-superficie #btn-regla {
+  display: none !important;
+}
+
+#hud-superficie {
+  position: fixed;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+  animation: fundido 0.8s ease-out;
+}
+
+.hud-lugar {
+  position: absolute;
+  top: calc(var(--margen) + 64px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 22px 12px;
+  border-radius: 18px;
+  text-align: center;
+  background: rgba(8, 8, 10, 0.38);
+  backdrop-filter: var(--desenfoque);
+  -webkit-backdrop-filter: var(--desenfoque);
+  box-shadow: var(--sombra), var(--relieve);
+}
+
+#hud-mundo {
+  font-family: var(--serif);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  background: var(--metal-texto);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+#hud-coordenadas,
+#hud-sol {
+  margin-top: 4px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Brújula: regla de grados que se desplaza con el rumbo */
+#hud-brujula {
+  position: absolute;
+  left: 50%;
+  bottom: 84px;
+  width: min(560px, 80vw);
+  height: 34px;
+  transform: translateX(-50%);
+  overflow: hidden;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+  mask: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent);
+}
+
+#hud-escala {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  white-space: nowrap;
+}
+
+#hud-escala span {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+#hud-escala span.mayor {
+  height: 13px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+#hud-escala b {
+  position: absolute;
+  top: 16px;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--texto);
+}
+
+.hud-aguja {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid #fff;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 0 4px var(--luz));
+}
+
+#hud-salir {
+  position: absolute;
+  left: 50%;
+  bottom: 136px;
+  transform: translateX(-50%);
+  padding: 9px 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--vidrio);
+  backdrop-filter: var(--desenfoque);
+  -webkit-backdrop-filter: var(--desenfoque);
+  box-shadow: var(--sombra), var(--relieve);
+  color: var(--texto);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+#hud-salir:hover {
+  box-shadow: var(--sombra), var(--relieve), 0 0 24px -6px var(--luz);
+}
+
+/* Destello al hacer una foto */
+#flash {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#flash.disparo {
+  animation: flash 0.6s ease-out;
+}
+
+@keyframes flash {
+  from {
+    opacity: 0.85;
+  }
+}
+
+
+/* =========================================================================
+   Tipografía editorial: cifras y datos en monoespaciada
+   ========================================================================= */
+.fila b,
+#fecha,
+#dia-juliano,
+.velocidad,
+.evento time,
+.deslizador output,
+#regla-etiqueta,
+#hud-coordenadas,
+#hud-sol,
+#cine-paso,
+#telemetria b,
+#escala-barra span {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
+
+.fila b,
+#fecha {
+  font-size: 12px;
+}
+
+.velocidad {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+#ficha-nombre::after {
+  content: '';
+  display: block;
+  width: 36px;
+  height: 1px;
+  margin-top: 12px;
+  background: linear-gradient(90deg, #fff, transparent);
+}
+
+/* =========================================================================
+   HUD de instrumentación
+   ========================================================================= */
+#hud {
+  position: fixed;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+/* Marcas de encuadre en las esquinas de la pantalla */
+.marco {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: rgba(255, 255, 255, 0.28);
+  border-style: solid;
+  border-width: 0;
+}
+
+.marco.sup-izq { top: 8px; left: 8px; border-top-width: 1px; border-left-width: 1px; }
+.marco.sup-der { top: 8px; right: 8px; border-top-width: 1px; border-right-width: 1px; }
+.marco.inf-izq { bottom: 8px; left: 8px; border-bottom-width: 1px; border-left-width: 1px; }
+.marco.inf-der { bottom: 8px; right: 8px; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* Retícula: cuatro esquinas que se cierran sobre el objetivo */
+#reticula {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+
+#reticula i {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 0 solid rgba(255, 255, 255, 0.85);
+  filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+}
+
+#reticula i:nth-child(1) { top: 0; left: 0; border-top-width: 1.5px; border-left-width: 1.5px; }
+#reticula i:nth-child(2) { top: 0; right: 0; border-top-width: 1.5px; border-right-width: 1.5px; }
+#reticula i:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1.5px; border-left-width: 1.5px; }
+#reticula i:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+
+#reticula.fijando i {
+  animation: fijar 0.7s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+#reticula.fijando i:nth-child(1) { --dx: -18px; --dy: -18px; }
+#reticula.fijando i:nth-child(2) { --dx: 18px; --dy: -18px; }
+#reticula.fijando i:nth-child(3) { --dx: -18px; --dy: 18px; }
+#reticula.fijando i:nth-child(4) { --dx: 18px; --dy: 18px; }
+
+@keyframes fijar {
+  0% {
+    transform: translate(var(--dx), var(--dy));
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(calc(var(--dx) * -0.12), calc(var(--dy) * -0.12));
+  }
+}
+
+#hud-guia {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+#hud-guia line {
+  stroke: rgba(255, 255, 255, 0.45);
+  stroke-width: 1;
+}
+
+#telemetria {
+  position: absolute;
+  top: 0;
+  left: 0;
+  min-width: 150px;
+  padding: 2px 0 2px 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.45);
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+  will-change: transform;
+}
+
+#telemetria div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  line-height: 1.7;
+}
+
+#telemetria span {
+  font-size: 9.5px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--texto-suave);
+}
+
+#telemetria b {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--texto);
+}
+
+/* Barra de escala */
+#escala-barra {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+#escala-barra .barra {
+  height: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-top: none;
+  transition: width 0.2s;
+}
+
+#escala-barra span {
+  font-size: 10px;
+  color: var(--texto-suave);
+}
+
+/* Destello de lente */
+#destellos .destello {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 244, 225, 0.35), rgba(255, 244, 225, 0) 70%);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+#destellos .destello.estrella {
+  width: 520px;
+  height: 520px;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 250, 240, 0.5) 50%, transparent 100%) center / 100% 1.5px no-repeat,
+    linear-gradient(0deg, transparent 20%, rgba(255, 250, 240, 0.25) 50%, transparent 80%) center / 1px 100% no-repeat,
+    radial-gradient(circle, rgba(255, 248, 235, 0.35), transparent 22%);
+}
+
+#destellos .destello.anillo {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, transparent 58%, rgba(255, 240, 220, 0.25) 66%, transparent 74%);
+}
+
+#destellos .destello.anillo.grande {
+  width: 260px;
+  height: 260px;
+}
+
+#destellos .destello.pequeño {
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent 70%);
+}
+
+/* Rótulos de la carta celeste */
+.etiqueta.carta {
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+.etiqueta.constelacion {
+  color: rgba(255, 255, 255, 0.32);
+  font-family: var(--serif);
+  font-size: 17px;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+body.modo-cine #hud,
+body.modo-superficie #reticula,
+body.modo-superficie #telemetria,
+body.modo-superficie #hud-guia,
+body.modo-superficie #escala-barra {
+  display: none !important;
+}
+
+/* =========================================================================
+   Secuencia de arranque
+   ========================================================================= */
+#carga-log {
+  width: min(360px, 80vw);
+  min-height: 120px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.9;
+  color: var(--texto-tenue);
+}
+
+#carga-log li {
+  display: flex;
+  justify-content: space-between;
+  animation: aparecer 0.35s ease-out;
+}
+
+#carga-log li::after {
+  content: 'OK';
+  color: var(--texto-suave);
+}
+
+#carga-log li.pendiente::after {
+  content: '···';
+  animation: parpadeo 0.9s steps(2) infinite;
+}
+
+#carga-log li:last-child {
+  color: var(--texto);
+}
+
+@keyframes parpadeo {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@media (max-width: 700px) {
+  #telemetria,
+  #hud-guia,
+  #escala-barra,
+  .marco {
+    display: none !important;
+  }
+
+  #ficha-nombre {
+    font-size: 30px;
   }
 }
